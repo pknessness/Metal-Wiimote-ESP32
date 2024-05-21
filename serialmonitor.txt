@@ -1,0 +1,466 @@
+����������������������������������������������������������������otifyHostRecv: 04 01 01 00
+sendQueueData
+handleHciEvent
+EVENT code=01 len=1 data=00 inquiry_complete status=00resetDevice
+sendHciPacket
+sendQueueData
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 03 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 03 0C 00 handleCommandCompleteEvent
+reset succeeded
+sendHciPacket
+sendQueueData
+queued read_bd_addr
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 0a 05 09 10 00 fa b0 df ea 6b e8
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=10 data=05 09 10 00 FA B0 DF EA 6B E8 handleCommandCompleteEvent
+read_bd_addr succeeded(BD_ADDR=FA B0 DF EA 6B E8 )sizeof(name)=15sendHciPacket
+sendQueueData
+queued write_local_name
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 13 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 13 0C 00 handleCommandCompleteEvent
+write_local_name succeeded
+sendHciPacket
+sendQueueData
+queued write_class_of_device
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 24 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 24 0C 00 handleCommandCompleteEvent
+write_class_of_device succeeded
+sendHciPacket
+sendQueueData
+queued write_scan_enable
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 1a 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 1A 0C 00 handleCommandCompleteEvent
+write_scan_enable succeeded
+sendHciPacket
+sendQueueData
+queued inquiry
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 01 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 01 04 handleCommandStatusEvent
+pending HCI_OPCODE_INQUIRY
+notifyHostRecv: 04 01 01 00
+sendQueueData
+handleHciEvent
+EVENT code=01 len=1 data=00 inquiry_complete status=00resetDevice
+sendHciPacket
+sendQueueData
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 03 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 03 0C 00 handleCommandCompleteEvent
+reset succeeded
+sendHciPacket
+sendQueueData
+queued read_bd_addr
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 0a 05 09 10 00 fa b0 df ea 6b e8
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=10 data=05 09 10 00 FA B0 DF EA 6B E8 handleCommandCompleteEvent
+read_bd_addr succeeded(BD_ADDR=FA B0 DF EA 6B E8 )sizeof(name)=15sendHciPacket
+sendQueueData
+queued write_local_name
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 13 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 13 0C 00 handleCommandCompleteEvent
+write_local_name succeeded
+sendHciPacket
+sendQueueData
+queued write_class_of_device
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 24 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 24 0C 00 handleCommandCompleteEvent
+write_class_of_device succeeded
+sendHciPacket
+sendQueueData
+queued write_scan_enable
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 1a 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 1A 0C 00 handleCommandCompleteEvent
+write_scan_enable succeeded
+sendHciPacket
+sendQueueData
+queued inquiry
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 01 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 01 04 handleCommandStatusEvent
+pending HCI_OPCODE_INQUIRY
+notifyHostRecv: 04 01 01 00
+sendQueueData
+handleHciEvent
+EVENT code=01 len=1 data=00 inquiry_complete status=00resetDevice
+sendHciPacket
+sendQueueData
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 03 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 03 0C 00 handleCommandCompleteEvent
+reset succeeded
+sendHciPacket
+sendQueueData
+queued read_bd_addr
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 0a 05 09 10 00 fa b0 df ea 6b e8
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=10 data=05 09 10 00 FA B0 DF EA 6B E8 handleCommandCompleteEvent
+read_bd_addr succeeded(BD_ADDR=FA B0 DF EA 6B E8 )sizeof(name)=15sendHciPacket
+sendQueueData
+queued write_local_name
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 13 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 13 0C 00 handleCommandCompleteEvent
+write_local_name succeeded
+sendHciPacket
+sendQueueData
+queued write_class_of_device
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 24 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 24 0C 00 handleCommandCompleteEvent
+write_class_of_device succeeded
+sendHciPacket
+sendQueueData
+queued write_scan_enable
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 1a 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 1A 0C 00 handleCommandCompleteEvent
+write_scan_enable succeeded
+sendHciPacket
+sendQueueData
+queued inquiry
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 01 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 01 04 handleCommandStatusEvent
+pending HCI_OPCODE_INQUIRY
+notifyHostRecv: 04 02 0f 01 70 3b a5 51 e7 e0 01 00 00 04 25 00 e9 4d
+sendQueueData
+handleHciEvent
+inquiry_result
+BD_ADDR(0/1) : E0 E7 51 A5 3B 70     Page_Scan_Repetition_Mode = 01    Class_of_Device = 04 25 00    Clock_Offset = E9 4D    sendHciPacket
+sendQueueData
+queued remote_name_request
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 19 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 19 04 handleCommandStatusEvent
+pending HCI_OPCODE_REMOTE_NAME_REQUEST
+notifyHostRecv: 04 01 01 00
+sendQueueData
+handleHciEvent
+EVENT code=01 len=1 data=00 inquiry_complete status=00resetDevice
+sendHciPacket
+sendQueueData
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 03 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 03 0C 00 handleCommandCompleteEvent
+reset succeeded
+sendHciPacket
+sendQueueData
+queued read_bd_addr
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 0a 05 09 10 00 fa b0 df ea 6b e8
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=10 data=05 09 10 00 FA B0 DF EA 6B E8 handleCommandCompleteEvent
+read_bd_addr succeeded(BD_ADDR=FA B0 DF EA 6B E8 )sizeof(name)=15sendHciPacket
+sendQueueData
+queued write_local_name
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 13 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 13 0C 00 handleCommandCompleteEvent
+write_local_name succeeded
+sendHciPacket
+sendQueueData
+queued write_class_of_device
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 24 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 24 0C 00 handleCommandCompleteEvent
+write_class_of_device succeeded
+sendHciPacket
+sendQueueData
+queued write_scan_enable
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 1a 0c 00
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0E len=4 data=05 1A 0C 00 handleCommandCompleteEvent
+write_scan_enable succeeded
+sendHciPacket
+sendQueueData
+queued inquiry
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 01 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 01 04 handleCommandStatusEvent
+pending HCI_OPCODE_INQUIRY
+notifyHostRecv: 04 02 0f 01 70 3b a5 51 e7 e0 01 00 00 04 25 00 64 62
+sendQueueData
+handleHciEvent
+inquiry_result
+
+BD_ADDR(0/1) : E0 E7 51 A5 3B 70     Page_Scan_Repetition_Mode = 01    Class_of_Device = 04 25 00    Clock_Offset = 64 62    sendHciPacket
+sendQueueData
+queued remote_name_request
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0f 04 00 05 19 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 19 04 handleCommandStatusEvent
+pending HCI_OPCODE_REMOTE_NAME_REQUEST
+notifyHostRecv: 04 07 ff 00 70 3b a5 51 e7 e0 4e 69 6e 74 65 6e 64 6f 20 52 56 4c 2d 43 4e 54 2d 30 31 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+sendQueueData
+handleHciEvent
+EVENT code=07 len=255 data=00 70 3B A5 51 E7 E0 4E 69 6E 74 65 6E 64 6F 20 52 56 4C 2D 43 4E 54 2D 30 31 00 00 00 00 ...remote_name_request_complete status=00  BD_ADDR = E0 E7 51 A5 3B 70   REMOTE_NAME = Nintendo RVL-CNT-01sendHciPacket
+sendQueueData
+queued inquiry_cancel
+sendHciPacket
+sendQueueData
+queued create_connection
+esp_vhci_host_check_send_available=1notifyHostRecv: 04 0e 04 05 02 04 00
+sendQueueData
+notifyHostSendAvailable
+esp_vhci_host_check_send_available=1handleHciEvent
+EVENT code=0E len=4 data=05 02 04 00 handleCommandCompleteEvent
+inquiry_cancel succeeded
+notifyHostRecv: 04 0f 04 00 05 05 04
+sendQueueData
+notifyHostSendAvailable
+handleHciEvent
+EVENT code=0F len=4 data=00 05 05 04 handleCommandStatusEvent
+pending HCI_OPCODE_CREATE_CONNECTION
+notifyHostRecv: 04 03 0b 00 81 00 70 3b a5 51 e7 e0 01 00
+sendQueueData
+handleHciEvent
+EVENT code=03 len=11 data=00 81 00 70 3B A5 51 E7 E0 01 00 connection_complete status=00  Connection_Handle  = 0x0081  BD_ADDR            = E0 E7 51 A5 3B 70   Link_Type          = 01  Encryption_Enabled = 00sendHciPacket
+sendQueueData
+queued acl_l2cap_single_packet(CONNECTION REQUEST)
+esp_vhci_host_check_send_available=1notifyHostSendAvailable
+notifyHostRecv: 04 13 05 01 81 00 01 00
+sendQueueData
+notifyHostRecv: 02 81 20 10 00 0c 00 01 00 03 01 08 00 46 00 45 00 01 00 00 00
+sendQueueData
+handleHciEvent
+EVENT code=13 len=5 data=01 81 00 01 00 handleAclData
+len=20 data=81 20 10 00 0C 00 01 00 03 01 08 00 46 00 45 00 01 00 00 00 
+handleL2capData
+data[0]=03
+L2CAP CONNECTION RESPONSEnotifyHostRecv:  identifier      = 01 02 81 20 10 00 0c 00  dest cid = 0046 01 00 03 01 08 00 46 00 45 00 00 00 00 00
+sendQueueData
+  src cid      = 0045  result          = 0001  status          = 0000handleAclData
+len=20 data=81 20 10 00 0C 00 01 00 03 01 08 00 46 00 45 00 00 00 00 00 
+handleL2capData
+data[0]=03
+L2CAP CONNECTION RESPONSE  identifier      = 01  dest cid = 0046  src cid      = 0045  result          = 0000  status          = 0000sendHciPacket
+sendQueueData
+queued acl_l2cap_single_packet(CONFIGURATION REQUEST)
+esp_vhci_host_check_send_available=1notifyHostSendAvailable
+notifyHostRecv: 04 13 05 01 81 00 01 00
+sendQueueData
+notifyHostRecv: 02 81 20 12 00 0e 00 01 00 05 02 0a 00 45 00 00 00 00 00 01 02 40 00
+sendQueueData
+handleHciEvent
+notifyHostRecv:EVENT code=13 len=5 data=01 81 00 01 00  02 81 20 10 00 0c 00 01 00 04 0c 08 00 45 00 00 00 01 02 b9 00
+sendQueueData
+handleAclData
+len=22 data=81 20 12 00 0E 00 01 00 05 02 0A 00 45 00 00 00 00 00 01 02 40 00 
+handleL2capData
+data[0]=05
+L2CAP CONFIGURATION RESPONSE
+identifier      = 02  len             = 000A  cid      = 0045  flags           = 0000  result          = 0000  config          = 01 02 40 00 handleAclData
+len=20 data=81 20 10 00 0C 00 01 00 04 0C 08 00 45 00 00 00 01 02 B9 00 
+handleL2capData
+data[0]=04
+L2CAP CONFIGURATION REQUEST
+identifier      = 0Clen             = 08  dstCID = 0045  flags           = 0000  config          = 01 02 B9 00   MTU=185sendHciPacket
+sendQueueData
+queued acl_l2cap_single_packet(CONFIGURATION RESPONSE)
+esp_vhci_host_check_send_available=1notifyHostSendAvailable
+notifyHostRecv: 04 13 05 01 81 00 01 00
+sendQueueData
+handleHciEvent
+EVENT code=13 len=5 data=01 81 00 01 00 notifyHostRecv: 04 0d 15 00 81 00 00 01 a4 06 00 00 00 00 00 00 10 27 00 00 ff ff ff ff
+sendQueueData
+notifyHostRecv: 02 81 20 08 00 04 00 45 00 a1 30 00 00
+sendQueueData
+handleHciEvent
+EVENT code=0D len=21 data=00 81 00 00 01 A4 06 00 00 00 00 00 00 10 27 00 00 FF FF FF FF handleAclData
+len=12 data=81 20 08 00 04 00 45 00 A1 30 00 00 
+handleL2capData
+data[0]=A1
+sendHciPacket
+sendQueueData
+queued acl_l2cap_single_packet(Set LEDs)Wiimote detected
+setDataReportingMode 0x31 (ch:129)
+sendHciPacket
+sendQueueData
+queued setDataReportingMode
+REPORT_STATE_INIT
+REPORT len=4 data=A1 30 00 00 
+button: 00000 = ............., wiimote.axis:   0/  0/  0, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+esp_vhci_host_check_send_available=1notifyHostSendAvailable
+notifyHostRecv: 04 13 05 01 81 00 01 00
+sendQueueData
+esp_vhci_host_check_send_available=1handleHciEvent
+notifyHostSendAvailable
+EVENT code=13 len=5 data=01 81 00 01 00 notifyHostRecv: 04 13 05 01 81 00 01 00
+sendQueueData
+handleHciEvent
+EVENT code=13 len=5 data=01 81 00 01 00 notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 00 60 81 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 00 60 81 83 9E 
+button: 00060 = ............., wiimote.axis: 129/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 20 40 81 84 9e
+sendQueueData
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 40 60 81 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 20 40 81 84 9E 
+button: 02040 = ............., wiimote.axis: 129/132/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 40 60 81 83 9E 
+button: 04060 = ............., wiimote.axis: 129/131/158notifyHostRecv:, nunchuk.axis:   0/  0/  0 02 81 20, nunchuk.stick:   0/  0
+ 0b 00 07 00 45 00 a1 31 20 40 81 84 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 20 40 81 84 9E 
+notifyHostRecv:button: 02040 = ............. 02 81 20 0b 00 07 00 45 00 a1 31 60 60 81 83 9e
+sendQueueData
+, wiimote.axis: 129/132/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 60 60 81 83 9E 
+button: 06060 = ............., wiimote.axis: 129/131/158notifyHostRecv:, nunchuk.axis:   0/  0/  0 02 81 20, nunchuk.stick:   0/  0
+ 0b 00 07 00 45 00 a1 31 60 40 81 84 9e
+sendQueueData
+handleAclData
+handleL2capData
+notifyHostRecv:data[0]=A1
+ 02 81 20 0bREPORT_STATE_INIT
+ 00 07 00 45 00 a1 31 00 20 82 83 9e
+sendQueueData
+REPORT len=7 data=A1 31 60 40 81 84 9E 
+button: 06040 = ............., wiimote.axis: 129/132/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 00 20 82 83 9E 
+button: 00020 = ............., wiimote.axis: 130/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 60 20 81 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 60 20 81 83 9E 
+button: 06020 = ............., wiimote.axis: 129/131/158notifyHostRecv:, nunchuk.axis:   0/  0/  0 02 81 20 0b 00 07 00 45 00 a1 31 00 20 82 83 9e, nunchuk.stick:   0/  0
+
+sendQueueData
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 60 60 81 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 00 20 82 83 9E 
+button: 00020 = ............., wiimote.axis: 130/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 60 60 81 83 9E 
+button: 06060 = ............., wiimote.axis: 129/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 20 40 81 84 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 20 40 81 84 9E 
+button: 02040 = .............notifyHostRecv:, wiimote.axis: 129/132/158 02 81 20 0b 00 07 00 45 00 a1 31 20 60 81 83 9e
+sendQueueData
+, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 20 60 81 83 9E 
+button: 02060 = ............., wiimote.axis: 129/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 40 40 81 84 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 40 40 81 84 9E 
+button: 04040 = ............., wiimote.axis: 129/132/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 40 60 81 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1
+REPORT_STATE_INIT
+REPORT len=7 data=A1 31 40 60 81 83 9E 
+button: 04060 = ............., wiimote.axis: 129/131/158, nunchuk.axis:   0/  0/  0, nunchuk.stick:   0/  0
+notifyHostRecv: 02 81 20 0b 00 07 00 45 00 a1 31 00 60 82 83 9e
+sendQueueData
+handleAclData
+handleL2capData
+data[0]=A1

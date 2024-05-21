@@ -1,0 +1,53 @@
+{
+    "workbench.iconTheme": "vs-seti",
+    "actionButtons": {
+        "commands": [
+            {
+                "name": "esp-idf setup",
+                "terminalName": "esp-idf",
+                "color": "yellow",
+                "command": "${path}/export.ps1",
+            },
+            {
+                "name": "idf build",
+                "terminalName": "esp-idf",
+                "color": "green",
+                "command": "python ${path}/tools/idf.py build",
+            },
+            {
+                "name": "idf flash",
+                "terminalName": "esp-idf",
+                "color": "lime",
+                "useVsCodeApi": false,
+                "ignoreCwd": true,
+                "ignoreClear": true,
+                "command": "python ${path}/tools/idf.py -p COM13 flash",
+                "extraCommands": [
+                    "python ${path}/tools/idf.py -p COM13 monitor",
+                ]
+            },
+            {
+                "name": "idf monitor",
+                "terminalName": "esp-idf",
+                "color": "cyan",
+                "command": "python ${path}/tools/idf.py -p COM13 monitor",
+            },
+            {
+                "name": "idf build-flash-monitor",
+                "terminalName": "esp-idf",
+                "color": "red",
+                "command": "python ${path}/tools/idf.py build",
+                "extraCommands": [
+                    "python ${path}/tools/idf.py -p COM13 flash",
+                    "python ${path}/tools/idf.py -p COM13 monitor",
+                ]
+            }
+        ],
+        "defaultColor": "white",
+        "reloadButton": "↻",
+        "loadNpmCommands": false,
+        "customVars": {
+            "path": "../../esp-idf" /* Can be used in command as `${port}`*/
+        }
+    }
+}
