@@ -47,7 +47,7 @@
         "reloadButton": "↻",
         "loadNpmCommands": false,
         "customVars": {
-            "path": "../../esp-idf" /* Can be used in command as `${port}`*/
+            "path": "../../esp-idf" /* Can be used in command as `${path}`*/
         }
     }
 }
