@@ -1,0 +1,23 @@
+Regular one from Home:
+
+MAC?: 0027091A81C2
+
+Capabilities:
+000000C4
+CM_DEVCAP_REMOVABLE
+CM_DEVCAP_RAWDEVICEOK
+CM_DEVCAP_SURPRISEREMOVALOK
+
+Rank of Driver:
+00FF2000
+
+Bluetooth class of Device:
+00002504
+
+Product ID: 06 03
+Vendor ID: 7E 05
+Vendor ID Source: 02
+
+Display Name: Nintendo RVL-CNT-01
+
+060E3C5B0580

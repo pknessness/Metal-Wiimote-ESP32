@@ -47,7 +47,8 @@
         "reloadButton": "↻",
         "loadNpmCommands": false,
         "customVars": {
-            "path": "../../esp-idf" /* Can be used in command as `${path}`*/
+            "path": "C:/Users/ansha/Projects/esp-idf" /* Can be used in command as `${path}`*/
         }
-    }
+    },
+    "idf.pythonInstallPath": "C:\\Users\\ansha\\.espressif\\tools\\idf-python\\3.11.2\\python.exe"
 }
