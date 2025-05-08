@@ -10,3 +10,5 @@ pywiiuse
 WiiSP32mote/build/
 
 L2Cap-tests/build/
+
+ESP32Wiimote
