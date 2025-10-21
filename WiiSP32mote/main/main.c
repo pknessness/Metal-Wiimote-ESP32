@@ -20,6 +20,17 @@
 #include "freertos/task.h"
 #include "freertos/semphr.h"
 
+#include "esp_random.h"
+#include "esp_l2cap_bt_api.h"
+#include "esp_mac.h"
+#include "esp_vfs.h"
+
+//write?
+
+
+#define L2CAP_TAG                     "L2CAP_TAG"
+#define L2CAP_DATA_LEN                100
+
 #define REPORT_PROTOCOL_MOUSE_REPORT_SIZE      (4)
 #define REPORT_BUFFER_SIZE                     REPORT_PROTOCOL_MOUSE_REPORT_SIZE
 
@@ -80,114 +91,141 @@ uint8_t WiiMoteHIDDescriptor[] = {
     |           Wiimote           |
     |-----------------------------|
     */  
-    0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
-    0x09, 0x05,                    // USAGE (Game Pad)
-    0xa1, 0x01,                    // COLLECTION (Application)
-    0x06, 0x00, 0xff,              //   USAGE_PAGE (Vendor Defined)
-    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
-    0x26, 0xff, 0x00,              //   LOGICAL_MAXIMUM (255)
-    0x75, 0x08,                    //   REPORT_SIZE (8)
-    0x85, 0x10,                    //   REPORT_ID (0x10)
-    0x95, 0x00,                    //   REPORT_COUNT (0)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x11,                    //   REPORT_ID (0x11)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x12,                    //   REPORT_ID (0x12)
-    0x95, 0x02,                    //   REPORT_COUNT (2)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x13,                    //   REPORT_ID (0x13)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x14,                    //   REPORT_ID (0x14)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x15,                    //   REPORT_ID (0x15)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x16,                    //   REPORT_ID (0x16)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x17,                    //   REPORT_ID (0x17)
-    0x95, 0x06,                    //   REPORT_COUNT (6)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x18,                    //   REPORT_ID (0x18)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x19,                    //   REPORT_ID (0x19)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x1a,                    //   REPORT_ID (0x1a)
-    0x95, 0x01,                    //   REPORT_COUNT (1)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x91, 0x00,                    //   OUTPUT (Data,Ary,Abs)
-    0x85, 0x20,                    //   REPORT_ID (0x20)
-    0x95, 0x06,                    //   REPORT_COUNT (6)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x21,                    //   REPORT_ID (0x21)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x22,                    //   REPORT_ID (0x22)
-    0x95, 0x04,                    //   REPORT_COUNT (4)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x30,                    //   REPORT_ID (0x30)
-    0x95, 0x02,                    //   REPORT_COUNT (2)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x31,                    //   REPORT_ID (0x31)
-    0x95, 0x05,                    //   REPORT_COUNT (5)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x32,                    //   REPORT_ID (0x32)
-    0x95, 0x0a,                    //   REPORT_COUNT (10)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x33,                    //   REPORT_ID (0x33)
-    0x95, 0x11,                    //   REPORT_COUNT (17)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x34,                    //   REPORT_ID (0x34)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x35,                    //   REPORT_ID (0x35)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x36,                    //   REPORT_ID (0x36)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x37,                    //   REPORT_ID (0x37)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x3d,                    //   REPORT_ID (0x3d)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x3e,                    //   REPORT_ID (0x3e)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0x85, 0x3f,                    //   REPORT_ID (0x3f)
-    0x95, 0x15,                    //   REPORT_COUNT (21)
-    0x09, 0x01,                    //   USAGE (Vendor Usage 1)
-    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
-    0xc0                           // END_COLLECTION
+    0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    0x09, 0x05,        // Usage (Game Pad)
+    0xA1, 0x01,        // Collection (Application)
+
+    0x85, 0x10,        //   Report ID (16) (0x10) Rumble
+    0x15, 0x00,        //   Logical Minimum (0)
+    0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    0x75, 0x08,        //   Report Size (8)
+    0x95, 0x01,        //   Report Count (1)
+    0x06, 0x00, 0xFF,  //   Usage Page (Vendor Defined 0xFF00)
+    0x09, 0x01,        //   Usage (0x01)
+    0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    0x85, 0x11,        //   Report ID (17) (0x11) Player LEDs
+    0x95, 0x01,        //   Report Count (1)
+    0x09, 0x01,        //   Usage (0x01)
+    0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    0x85, 0x12,        //   Report ID (18) (0x12) Data Reporting mode
+    0x95, 0x02,        //   Report Count (2)
+    0x09, 0x01,        //   Usage (0x01)
+    0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x13,        //   Report ID (19) (0x13) IR Camera Enable
+    // 0x95, 0x01,        //   Report Count (1)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x14,        //   Report ID (20) (0x14) Speaker Enable
+    // 0x95, 0x01,        //   Report Count (1)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    0x85, 0x15,        //   Report ID (21) (0x15) Status Information Request
+    0x95, 0x01,        //   Report Count (1)
+    0x09, 0x01,        //   Usage (0x01)
+    0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x16,        //   Report ID (22) (0x16) Write Memory and Registers
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x17,        //   Report ID (23) (0x17) Read Memory and Registers
+    // 0x95, 0x06,        //   Report Count (6)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x18,        //   Report ID (24) (0x18) Speaker Data
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    // 0x85, 0x19,        //   Report ID (25) (0x19) Speaker Mute
+    // 0x95, 0x01,        //   Report Count (1)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    0x85, 0x1A,        //   Report ID (26) (0x1A) IR Camera Enable 2
+    0x95, 0x01,        //   Report Count (1)
+    0x09, 0x01,        //   Usage (0x01)
+    0x91, 0x00,        //   Output (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+
+    0x85, 0x20,        //   Report ID (32) (0x20) Status Information
+    0x95, 0x06,        //   Report Count (6)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0x85, 0x21,        //   Report ID (33) (0x21) Read Memory and Registers Data
+    0x95, 0x15,        //   Report Count (21)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0x85, 0x22,        //   Report ID (34) (0x22) Acknowledge output report, return function result
+    0x95, 0x04,        //   Report Count (4)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0x85, 0x30,        //   Report ID (48) (0x30) Data Reports: Core Buttons
+    0x95, 0x02,        //   Report Count (2)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0x85, 0x31,        //   Report ID (49) (0x31) Data Reports: Core Buttons and Accelerometer
+    0x95, 0x05,        //   Report Count (5)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x32,        //   Report ID (50) (0x32) Data Reports: Core Buttons with 8 Extension bytes
+    // 0x95, 0x0A,        //   Report Count (10)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x33,        //   Report ID (51) (0x33) Data Reports: Core Buttons and Accelerometer with 12 IR bytes
+    // 0x95, 0x11,        //   Report Count (17)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x34,        //   Report ID (52) (0x34) Data Reports: Core Buttons with 19 Extension bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x35,        //   Report ID (53) (0x35) Data Reports: Core Buttons and Accelerometer with 16 Extension Bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x36,        //   Report ID (54) (0x36) Data Reports: Core Buttons with 10 IR bytes and 9 Extension Bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x37,        //   Report ID (55) (0x37) Data Reports: Core Buttons and Accelerometer with 10 IR bytes and 6 Extension Bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x3D,        //   Report ID (61) (0x3D) Data Reports: 21 Extension Bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    // 0x85, 0x3E,        //   Report ID (62) (0x3E) Data Reports: Interleaved Core Buttons and Accelerometer with 36 IR bytes
+    // 0x95, 0x15,        //   Report Count (21)
+    // 0x09, 0x01,        //   Usage (0x01)
+    // 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0x85, 0x3F,        //   Report ID (63) (0x3F) Data Reports: Interleaved Core Buttons and Accelerometer with 36 IR bytes
+    0x95, 0x15,        //   Report Count (21)
+    0x09, 0x01,        //   Usage (0x01)
+    0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+
+    0xC0,              // End Collection
+    0x00,              // Unknown (bTag: 0x00, bType: 0x00)
 };
 
 const int hid_mouse_descriptor_len = sizeof(hid_mouse_descriptor);
@@ -252,7 +290,7 @@ void send_mouse_report(uint8_t buttons, char dx, char dy, char wheel)
         s_local_param.buffer[1] = dx;
         s_local_param.buffer[2] = dy;
     }
-    esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INTRDATA, report_id, report_size, s_local_param.buffer);
+    //esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INTRDATA, report_id, report_size, s_local_param.buffer);
     xSemaphoreGive(s_local_param.mouse_mutex);
 }
 
@@ -489,8 +527,219 @@ void esp_bt_hidd_cb(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *param)
         }
         break;
     default:
+        ESP_LOGI(TAG, "ESP_HIDD event: %d", event);
         break;
     }
+}
+
+// /* L2CAP STUFF*/
+// /**
+//  * @brief     handler for write and read
+//  */
+// typedef void (* l2cap_wr_task_cb_t) (void *fd);
+
+// void l2cap_wr_task_start_up(l2cap_wr_task_cb_t p_cback, int fd)
+// {
+//     xTaskCreate(p_cback, "write_read", 4096, (void *)fd, 5, NULL);
+// }
+
+// void l2cap_wr_task_shut_down()
+// {
+//     vTaskDelete(NULL);
+// }
+
+// static char *bda2str(esp_bd_addr_t bda, char *str, size_t size)
+// {
+//     if (bda == NULL || str == NULL || size < 18) {
+//         return NULL;
+//     }
+
+//     sprintf(str, "%02x:%02x:%02x:%02x:%02x:%02x",
+//             bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]);
+//     return str;
+// }
+
+// static void l2cap_write_handle(void * param)
+// {
+//     int size = 0;
+//     int fd = (int)param;
+//     uint8_t *l2cap_data = NULL;
+//     uint16_t i = 0;
+
+//     l2cap_data = malloc(L2CAP_DATA_LEN);
+//     if (!l2cap_data) {
+//         ESP_LOGE(L2CAP_TAG, "malloc l2cap_data failed, fd:%d", fd);
+//         goto done;
+//     }
+
+//     for (i = 0; i < L2CAP_DATA_LEN; ++i) {
+//         l2cap_data[i] = i;
+//     }
+
+//     do {
+//         /*
+//          * The write function is blocked until all the target length of data has been sent to the lower layer
+//          * successfully an error occurs.
+//          */
+//         size = write(fd, l2cap_data, L2CAP_DATA_LEN);
+//         if (size == -1) {
+//             break;
+//         } else if (size == 0) {
+//             /*write fail due to ringbuf is full, retry after 500 ms*/
+//             vTaskDelay(500 / portTICK_PERIOD_MS);
+//         } else {
+//             ESP_LOGI(L2CAP_TAG, "fd = %d  data_len = %d", fd, size);
+//             vTaskDelay(50 / portTICK_PERIOD_MS);
+//         }
+//     } while (1);
+// done:
+//     if (l2cap_data) {
+//         free(l2cap_data);
+//     }
+//     l2cap_wr_task_shut_down();
+// }
+
+// static void esp_hdl_bt_l2cap_cb_evt(uint16_t event, void *p_param)
+// {
+//     char bda_str[18] = {0};
+//     esp_bt_l2cap_cb_param_t *l2cap_param = (esp_bt_l2cap_cb_param_t *)p_param;
+
+//     switch (event) {
+//     case ESP_BT_L2CAP_INIT_EVT:
+//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_INIT_EVT: status:%d", l2cap_param->init.status);
+//         if (l2cap_param->init.status == ESP_BT_L2CAP_SUCCESS) {
+//             esp_bt_l2cap_vfs_register();
+//         }
+//         break;
+//     case ESP_BT_L2CAP_UNINIT_EVT:
+//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_UNINIT_EVT: status:%d", l2cap_param->uninit.status);
+//         break;
+//     case ESP_BT_L2CAP_OPEN_EVT:
+//         if (l2cap_param->open.status == ESP_BT_L2CAP_SUCCESS) {
+//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_OPEN_EVT: status:%d, fd = %d, tx mtu = %"PRId32", remote_address:%s", l2cap_param->open.status,
+//                     l2cap_param->open.fd, l2cap_param->open.tx_mtu, bda2str(l2cap_param->open.rem_bda, bda_str, sizeof(bda_str)));
+//             l2cap_wr_task_start_up(l2cap_write_handle, l2cap_param->open.fd);
+//         } else {
+//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_OPEN_EVT: status:%d", l2cap_param->open.status);
+//         }
+//         break;
+//     case ESP_BT_L2CAP_CLOSE_EVT:
+//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CLOSE_EVT: status:%d", l2cap_param->close.status);
+//         break;
+//     case ESP_BT_L2CAP_CL_INIT_EVT:
+//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CL_INIT_EVT: status:%d", l2cap_param->cl_init.status);
+//         break;
+//     case ESP_BT_L2CAP_START_EVT:
+//         if (l2cap_param->start.status == ESP_BT_L2CAP_SUCCESS) {
+//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_START_EVT: status:%d, hdl:0x%"PRIx32", sec_id:0x%x",
+//                 l2cap_param->start.status, l2cap_param->start.handle, l2cap_param->start.sec_id);
+//         } else {
+//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_START_EVT: status:%d", l2cap_param->start.status);
+//         }
+//         break;
+//     case ESP_BT_L2CAP_SRV_STOP_EVT:
+//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CLOSE_EVT: status:%d, psm = 0x%x", l2cap_param->srv_stop.status, l2cap_param->srv_stop.psm);
+//         break;
+//     // case ESP_BT_L2CAP_VFS_REGISTER_EVT:
+//     //     ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_VFS_REGISTER_EVT: status:%d", l2cap_param->vfs_register.status);
+//     //     break;
+//     default:
+//         ESP_LOGI(L2CAP_TAG, "HEH?[%d]: status:?", event);
+//         break;
+//     }
+//     return;
+// }
+
+// /**
+//  * @brief  handler for the dispatched work
+//  *
+//  * @param [in] event  event id
+//  * @param [in] param  handler parameter
+//  */
+// typedef void (* bt_app_cb_t) (uint16_t event, void *param);
+
+// /**
+//  * @brief  parameter deep-copy function to be customized
+//  *
+//  * @param [out] p_dest  pointer to destination data
+//  * @param [in]  p_src   pointer to source data
+//  * @param [in]  len     data length in byte
+//  */
+// typedef void (* bt_app_copy_cb_t) (void *p_dest, void *p_src, int len);
+
+// /* message to be sent */
+// typedef struct {
+//     uint16_t       sig;      /*!< signal to bt_app_task */
+//     uint16_t       event;    /*!< message event id */
+//     bt_app_cb_t    cb;       /*!< context switch callback */
+//     void           *param;   /*!< parameter area needs to be last */
+// } bt_app_msg_t;
+
+// /* signal for `bt_app_work_dispatch` */
+// #define BT_APP_SIG_WORK_DISPATCH    (0x01)
+
+// bool bt_app_work_dispatch(bt_app_cb_t p_cback, uint16_t event, void *p_params, int param_len, bt_app_copy_cb_t p_copy_cback)
+// {
+//     ESP_LOGD(L2CAP_TAG, "%s event: 0x%x, param len: %d", __func__, event, param_len);
+
+//     bt_app_msg_t msg;
+//     memset(&msg, 0, sizeof(bt_app_msg_t));
+
+//     msg.sig = BT_APP_SIG_WORK_DISPATCH;
+//     msg.event = event;
+//     msg.cb = p_cback;
+
+//     if (param_len == 0) {
+//         return bt_app_send_msg(&msg);
+//     } else if (p_params && param_len > 0) {
+//         if ((msg.param = malloc(param_len)) != NULL) {
+//             memcpy(msg.param, p_params, param_len);
+//             /* check if caller has provided a copy callback to do the deep copy */
+//             if (p_copy_cback) {
+//                 p_copy_cback(msg.param, p_params, param_len);
+//             }
+//             return bt_app_send_msg(&msg);
+//         }
+//     }
+
+//     return false;
+// }
+
+// static void esp_bt_l2cap_cb(esp_bt_l2cap_cb_event_t event, esp_bt_l2cap_cb_param_t *param)
+// {
+//     switch (event) {
+//     case ESP_BT_L2CAP_INIT_EVT:
+//     case ESP_BT_L2CAP_UNINIT_EVT:
+//     case ESP_BT_L2CAP_OPEN_EVT:
+//     case ESP_BT_L2CAP_CLOSE_EVT:
+//     case ESP_BT_L2CAP_CL_INIT_EVT:
+//     case ESP_BT_L2CAP_START_EVT:
+//     case ESP_BT_L2CAP_SRV_STOP_EVT:
+//     //case ESP_BT_L2CAP_VFS_REGISTER_EVT: 
+//     {
+//         bt_app_work_dispatch(esp_hdl_bt_l2cap_cb_evt, event, param, sizeof(esp_bt_l2cap_cb_param_t), NULL);
+//         break;
+//     }
+//     default:
+//         ESP_LOGE(L2CAP_TAG, "Invalid L2CAP event: %d", event);
+//         break;
+//     }
+// }
+// /* L2CAP STUFF END*/
+
+int notifyHostRecv(uint8_t *data, uint16_t len) {
+    ESP_LOGI("notifyHostRecv", "start");
+    for (int i = 0; i < len; i++)
+    {
+        ESP_LOGI("notifyHostRecv", "%02x", data[i]);
+    }
+
+    //   if(ESP_OK == sendQueueData(rxQueue, data, len)){
+    //     return ESP_OK;
+    //   }else{
+    //     return ESP_FAIL;
+    //   }
+    return ESP_OK;
 }
 
 void app_main(void)
@@ -548,11 +797,11 @@ void app_main(void)
         s_local_param.app_param.name = "Wiimote";
         s_local_param.app_param.description = "WiiSPmote";
         s_local_param.app_param.provider = "PkNess";
-        s_local_param.app_param.subclass = ESP_HID_CLASS_MIC;
-        // s_local_param.app_param.desc_list = WiiMoteHIDDescriptor;
-        // s_local_param.app_param.desc_list_len = WiiMoteHIDDescriptor_len;
-        s_local_param.app_param.desc_list = hid_mouse_descriptor;
-        s_local_param.app_param.desc_list_len = hid_mouse_descriptor_len;
+        s_local_param.app_param.subclass = ESP_HID_CLASS_GPD;
+        s_local_param.app_param.desc_list = WiiMoteHIDDescriptor;
+        s_local_param.app_param.desc_list_len = WiiMoteHIDDescriptor_len;
+        // s_local_param.app_param.desc_list = hid_mouse_descriptor;
+        // s_local_param.app_param.desc_list_len = hid_mouse_descriptor_len;
 
         memset(&s_local_param.both_qos, 0, sizeof(esp_hidd_qos_param_t)); // don't set the qos parameters
     } while (0);
@@ -580,5 +829,30 @@ void app_main(void)
     esp_bt_gap_set_pin(ESP_BT_PIN_TYPE_FIXED, 6, pin_code);
 
     print_bt_address();
-    ESP_LOGI(TAG, "exiting");
+    //ESP_LOGI(TAG, "exiting: %d", SDP_ONE_ATTRIBUTE_MAX_LEN);
+
+    esp_vhci_host_callback_t vhci_callback;
+    vhci_callback.notify_host_recv = notifyHostRecv;
+    //vhci_callback.notify_host_send_available = notifyHostSendAvailable;   
+
+    if ((ret = esp_vhci_host_register_callback( &vhci_callback )) != ESP_OK) {
+        ESP_LOGE(TAG, "hci callback failed: %s\n", esp_err_to_name(ret));
+        return;
+    }
+
+    while(1){
+        uint32_t rand = esp_random();
+        uint8_t one = (uint8_t)(rand & 0xFF);
+        uint8_t two = (uint8_t)((rand >> 8) & 0xFF);
+        
+        //esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INPUT, 0x30, 2, core);
+        // esp_bt_hid_device_send_report(0xa1, 0x30, 2, core);
+        if(esp_vhci_host_check_send_available()){
+            ESP_LOGI(TAG, "SENDING %2X %2X", one, two);
+            uint8_t core[4] = {0xa1, 0x30, one, two};
+            esp_vhci_host_send_packet(core, sizeof(core));
+        }
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
+
 }

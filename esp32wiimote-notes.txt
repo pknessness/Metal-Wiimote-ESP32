@@ -1,0 +1,30 @@
+ESP32Wiimote-program flow, for reverse engineering
+
+typedef struct tinywii_device_callback {
+    void (*hci_send_packet)(uint8_t *data, size_t len);
+} TwHciInterface;
+
+const TwHciInterface ESP32Wiimote::tinywii_hci_interface = {
+  ESP32Wiimote::hciHostSendPacket(uint8_t* data, size_t len)
+};
+
+Init:
+-ESP32Wiimote::init
+--TinyWiiMoteInit(tinywii_hci_interface)
+---*Sets hci interface and sets recievedData cnt, wp, rp to 0
+--ESP32Wiimote::createQueue
+---*Creates tx and rx queue RTOS-style
+--*set vhci host recv and send callback
+--*btstart, as well as setting vhci host register callback
+-*filter? idk
+
+Loop:
+-ESP32Wiimote::task
+--ESP32Wiimote::handleTxQueue
+--*check if tx queue has messages to send and if vhci can send, then send through esp_vhci_host_send_packet
+---first data is event type, either handleHciEvent
+--ESP32Wiimote::handleRxQueue
+--*check if rx queue has messages to recv, then recv through handleHciData
+--TinyWiiMote::handleHciData
+
+https://wiki.osdev.org/USB_Human_Interface_Devices

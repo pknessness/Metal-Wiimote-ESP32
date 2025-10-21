@@ -29,6 +29,8 @@
 #include "esp_sdp_api.h"
 #include "bt_app_core.h"
 
+#include "esp_random.h"
+
 #define L2CAP_TAG                     "L2CAP_TAG"
 #define SDP_TAG                       "SDP_TAG"
 #define L2CAP_DATA_LEN                100
@@ -86,29 +88,52 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
         break;
     }
     /* when Security Simple Pairing user confirmation requested, this event comes */
-    case ESP_BT_GAP_PIN_REQ_EVT:{
-        ESP_LOGI(L2CAP_TAG, "ESP_BT_GAP_PIN_REQ_EVT min_16_digit:%d", param->pin_req.min_16_digit);
-        if (param->pin_req.min_16_digit) {
-            ESP_LOGI(L2CAP_TAG, "Input pin code: 0000 0000 0000 0000");
-            esp_bt_pin_code_t pin_code = {0};
-            esp_bt_gap_pin_reply(param->pin_req.bda, true, 16, pin_code);
-        } else {
-            ESP_LOGI(L2CAP_TAG, "Input pin code: 1234");
-            esp_bt_pin_code_t pin_code;
-            pin_code[0] = '1';
-            pin_code[1] = '2';
-            pin_code[2] = '3';
-            pin_code[3] = '4';
-            esp_bt_gap_pin_reply(param->pin_req.bda, true, 4, pin_code);
-        }
-        break;
-    }
+    // case ESP_BT_GAP_PIN_REQ_EVT:{
+    //     ESP_LOGI(L2CAP_TAG, "ESP_BT_GAP_PIN_REQ_EVT min_16_digit:%d", param->pin_req.min_16_digit);
+    //     if (param->pin_req.min_16_digit) {
+    //         ESP_LOGI(L2CAP_TAG, "Input pin code: 0000 0000 0000 0000");
+    //         esp_bt_pin_code_t pin_code = {0};
+    //         esp_bt_gap_pin_reply(param->pin_req.bda, true, 16, pin_code);
+    //     } else {
+    //         ESP_LOGI(L2CAP_TAG, "Input pin code: 1234");
+    //         esp_bt_pin_code_t pin_code;
+    //         pin_code[0] = '1';
+    //         pin_code[1] = '2';
+    //         pin_code[2] = '3';
+    //         pin_code[3] = '4';
+    //         esp_bt_gap_pin_reply(param->pin_req.bda, true, 4, pin_code);
+    //     }
+    //     break;
+    // }
     /* when GAP mode changed, this event comes */
     case ESP_BT_GAP_MODE_CHG_EVT:
         ESP_LOGI(L2CAP_TAG, "ESP_BT_GAP_MODE_CHG_EVT mode:%d bda:[%s]", param->mode_chg.mode,
                  bda2str(param->mode_chg.bda, bda_str, sizeof(bda_str)));
         break;
     /* other */
+    case ESP_BT_GAP_DISC_RES_EVT:
+    case ESP_BT_GAP_DISC_STATE_CHANGED_EVT:
+    case ESP_BT_GAP_RMT_SRVCS_EVT:
+    case ESP_BT_GAP_RMT_SRVC_REC_EVT:
+    case ESP_BT_GAP_PIN_REQ_EVT:
+    case ESP_BT_GAP_CFM_REQ_EVT:
+    case ESP_BT_GAP_KEY_NOTIF_EVT:
+    case ESP_BT_GAP_KEY_REQ_EVT:
+    case ESP_BT_GAP_READ_RSSI_DELTA_EVT:
+    case ESP_BT_GAP_CONFIG_EIR_DATA_EVT:
+    case ESP_BT_GAP_SET_AFH_CHANNELS_EVT:
+    case ESP_BT_GAP_READ_REMOTE_NAME_EVT:
+    case ESP_BT_GAP_REMOVE_BOND_DEV_COMPLETE_EVT:
+    case ESP_BT_GAP_QOS_CMPL_EVT:
+    case ESP_BT_GAP_ACL_CONN_CMPL_STAT_EVT:
+    case ESP_BT_GAP_ACL_DISCONN_CMPL_STAT_EVT:
+    case ESP_BT_GAP_SET_PAGE_TO_EVT:
+    case ESP_BT_GAP_GET_PAGE_TO_EVT:
+    case ESP_BT_GAP_ACL_PKT_TYPE_CHANGED_EVT:
+    case ESP_BT_GAP_ENC_CHG_EVT:
+    case ESP_BT_GAP_SET_MIN_ENC_KEY_SIZE_EVT:
+    case ESP_BT_GAP_GET_DEV_NAME_CMPL_EVT:
+    case ESP_BT_GAP_EVT_MAX:
     default: {
         ESP_LOGI(L2CAP_TAG, "event: 0x%x", event);
         break;
@@ -141,6 +166,46 @@ static void l2cap_read_handle(void * param)
             ESP_LOGI(L2CAP_TAG, "fd = %d data_len = %d", fd, size);
             /* To avoid task watchdog */
             vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
+    } while (1);
+done:
+    if (l2cap_data) {
+        free(l2cap_data);
+    }
+    l2cap_wr_task_shut_down();
+}
+
+static void l2cap_write_handle(void * param)
+{
+    int size = 0;
+    int fd = (int)param;
+    uint8_t *l2cap_data = NULL;
+    uint16_t i = 0;
+
+    l2cap_data = malloc(L2CAP_DATA_LEN);
+    if (!l2cap_data) {
+        ESP_LOGE(L2CAP_TAG, "malloc l2cap_data failed, fd:%d", fd);
+        goto done;
+    }
+
+    for (i = 0; i < L2CAP_DATA_LEN; ++i) {
+        l2cap_data[i] = i;
+    }
+
+    do {
+        /*
+         * The write function is blocked until all the target length of data has been sent to the lower layer
+         * successfully an error occurs.
+         */
+        size = write(fd, l2cap_data, L2CAP_DATA_LEN);
+        if (size == -1) {
+            break;
+        } else if (size == 0) {
+            /*write fail due to ringbuf is full, retry after 500 ms*/
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        } else {
+            ESP_LOGI(L2CAP_TAG, "fd = %d  data_len = %d", fd, size);
+            vTaskDelay(50 / portTICK_PERIOD_MS);
         }
     } while (1);
 done:
@@ -215,6 +280,7 @@ static void esp_hdl_bt_l2cap_cb_evt(uint16_t event, void *p_param)
         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_SRV_STOP_EVT: status:%d, psm = 0x%x", l2cap_param->srv_stop.status, l2cap_param->srv_stop.psm);
         break;
     default:
+        ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_EVT: %2x",event);
         break;
     }
     return;
@@ -278,148 +344,148 @@ static void esp_hdl_sdp_cb_evt(uint16_t event, void *p_param)
     }
 }
 
-void esp_bt_hidd_cb(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *param)
-{
-    static const char *TAG = "esp_bt_hidd_cb";
-    switch (event) {
-    case ESP_HIDD_INIT_EVT:
-        if (param->init.status == ESP_HIDD_SUCCESS) {
-            ESP_LOGI(TAG, "setting hid parameters");
-            esp_bt_hid_device_register_app(&s_local_param.app_param, &s_local_param.both_qos, &s_local_param.both_qos);
-        } else {
-            ESP_LOGE(TAG, "init hidd failed!");
-        }
-        break;
-    case ESP_HIDD_DEINIT_EVT:
-        break;
-    case ESP_HIDD_REGISTER_APP_EVT:
-        if (param->register_app.status == ESP_HIDD_SUCCESS) {
-            ESP_LOGI(TAG, "setting hid parameters success!");
-            ESP_LOGI(TAG, "setting to connectable, discoverable");
-            esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
-            if (param->register_app.in_use) {
-                ESP_LOGI(TAG, "start virtual cable plug!");
-                esp_bt_hid_device_connect(param->register_app.bd_addr);
-            }
-        } else {
-            ESP_LOGE(TAG, "setting hid parameters failed!");
-        }
-        break;
-    case ESP_HIDD_UNREGISTER_APP_EVT:
-        if (param->unregister_app.status == ESP_HIDD_SUCCESS) {
-            ESP_LOGI(TAG, "unregister app success!");
-        } else {
-            ESP_LOGE(TAG, "unregister app failed!");
-        }
-        break;
-    case ESP_HIDD_OPEN_EVT:
-        if (param->open.status == ESP_HIDD_SUCCESS) {
-            if (param->open.conn_status == ESP_HIDD_CONN_STATE_CONNECTING) {
-                ESP_LOGI(TAG, "connecting...");
-            } else if (param->open.conn_status == ESP_HIDD_CONN_STATE_CONNECTED) {
-                ESP_LOGI(TAG, "connected to %02x:%02x:%02x:%02x:%02x:%02x", param->open.bd_addr[0],
-                    param->open.bd_addr[1], param->open.bd_addr[2], param->open.bd_addr[3], param->open.bd_addr[4],
-                    param->open.bd_addr[5]);
-                bt_app_task_start_up();
-                ESP_LOGI(TAG, "making self non-discoverable and non-connectable.");
-                esp_bt_gap_set_scan_mode(ESP_BT_NON_CONNECTABLE, ESP_BT_NON_DISCOVERABLE);
-            } else {
-                ESP_LOGE(TAG, "unknown connection status");
-            }
-        } else {
-            ESP_LOGE(TAG, "open failed!");
-        }
-        break;
-    case ESP_HIDD_CLOSE_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_CLOSE_EVT");
-        if (param->close.status == ESP_HIDD_SUCCESS) {
-            if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTING) {
-                ESP_LOGI(TAG, "disconnecting...");
-            } else if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTED) {
-                ESP_LOGI(TAG, "disconnected!");
-                bt_app_task_shut_down();
-                ESP_LOGI(TAG, "making self discoverable and connectable again.");
-                esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
-            } else {
-                ESP_LOGE(TAG, "unknown connection status");
-            }
-        } else {
-            ESP_LOGE(TAG, "close failed!");
-        }
-        break;
-    case ESP_HIDD_SEND_REPORT_EVT:
-        if (param->send_report.status == ESP_HIDD_SUCCESS) {
-            ESP_LOGI(TAG, "ESP_HIDD_SEND_REPORT_EVT id:0x%02x, type:%d", param->send_report.report_id,
-                     param->send_report.report_type);
-        } else {
-            ESP_LOGE(TAG, "ESP_HIDD_SEND_REPORT_EVT id:0x%02x, type:%d, status:%d, reason:%d",
-                     param->send_report.report_id, param->send_report.report_type, param->send_report.status,
-                     param->send_report.reason);
-        }
-        break;
-    case ESP_HIDD_REPORT_ERR_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_REPORT_ERR_EVT");
-        break;
-    case ESP_HIDD_GET_REPORT_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_GET_REPORT_EVT id:0x%02x, type:%d, size:%d", param->get_report.report_id,
-                 param->get_report.report_type, param->get_report.buffer_size);
-        if (check_report_id_type(param->get_report.report_id, param->get_report.report_type)) {
-            uint8_t report_id;
-            uint16_t report_len;
-            if (s_local_param.protocol_mode == ESP_HIDD_REPORT_MODE) {
-                report_id = 0;
-                report_len = REPORT_PROTOCOL_MOUSE_REPORT_SIZE;
-            } else {
-                // Boot Mode
-                report_id = ESP_HIDD_BOOT_REPORT_ID_MOUSE;
-                report_len = ESP_HIDD_BOOT_REPORT_SIZE_MOUSE - 1;
-            }
-            xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
-            esp_bt_hid_device_send_report(param->get_report.report_type, report_id, report_len, s_local_param.buffer);
-            xSemaphoreGive(s_local_param.mouse_mutex);
-        } else {
-            ESP_LOGE(TAG, "check_report_id failed!");
-        }
-        break;
-    case ESP_HIDD_SET_REPORT_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_SET_REPORT_EVT");
-        break;
-    case ESP_HIDD_SET_PROTOCOL_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_SET_PROTOCOL_EVT");
-        if (param->set_protocol.protocol_mode == ESP_HIDD_BOOT_MODE) {
-            ESP_LOGI(TAG, "  - boot protocol");
-            xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
-            s_local_param.x_dir = -1;
-            xSemaphoreGive(s_local_param.mouse_mutex);
-        } else if (param->set_protocol.protocol_mode == ESP_HIDD_REPORT_MODE) {
-            ESP_LOGI(TAG, "  - report protocol");
-        }
-        xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
-        s_local_param.protocol_mode = param->set_protocol.protocol_mode;
-        xSemaphoreGive(s_local_param.mouse_mutex);
-        break;
-    case ESP_HIDD_INTR_DATA_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_INTR_DATA_EVT");
-        break;
-    case ESP_HIDD_VC_UNPLUG_EVT:
-        ESP_LOGI(TAG, "ESP_HIDD_VC_UNPLUG_EVT");
-        if (param->vc_unplug.status == ESP_HIDD_SUCCESS) {
-            if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTED) {
-                ESP_LOGI(TAG, "disconnected!");
-                bt_app_task_shut_down();
-                ESP_LOGI(TAG, "making self discoverable and connectable again.");
-                esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
-            } else {
-                ESP_LOGE(TAG, "unknown connection status");
-            }
-        } else {
-            ESP_LOGE(TAG, "close failed!");
-        }
-        break;
-    default:
-        break;
-    }
-}
+// void esp_bt_hidd_cb(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *param)
+// {
+//     static const char *TAG = "esp_bt_hidd_cb";
+//     switch (event) {
+//     case ESP_HIDD_INIT_EVT:
+//         if (param->init.status == ESP_HIDD_SUCCESS) {
+//             ESP_LOGI(TAG, "setting hid parameters");
+//             esp_bt_hid_device_register_app(&s_local_param.app_param, &s_local_param.both_qos, &s_local_param.both_qos);
+//         } else {
+//             ESP_LOGE(TAG, "init hidd failed!");
+//         }
+//         break;
+//     case ESP_HIDD_DEINIT_EVT:
+//         break;
+//     case ESP_HIDD_REGISTER_APP_EVT:
+//         if (param->register_app.status == ESP_HIDD_SUCCESS) {
+//             ESP_LOGI(TAG, "setting hid parameters success!");
+//             ESP_LOGI(TAG, "setting to connectable, discoverable");
+//             esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+//             if (param->register_app.in_use) {
+//                 ESP_LOGI(TAG, "start virtual cable plug!");
+//                 esp_bt_hid_device_connect(param->register_app.bd_addr);
+//             }
+//         } else {
+//             ESP_LOGE(TAG, "setting hid parameters failed!");
+//         }
+//         break;
+//     case ESP_HIDD_UNREGISTER_APP_EVT:
+//         if (param->unregister_app.status == ESP_HIDD_SUCCESS) {
+//             ESP_LOGI(TAG, "unregister app success!");
+//         } else {
+//             ESP_LOGE(TAG, "unregister app failed!");
+//         }
+//         break;
+//     case ESP_HIDD_OPEN_EVT:
+//         if (param->open.status == ESP_HIDD_SUCCESS) {
+//             if (param->open.conn_status == ESP_HIDD_CONN_STATE_CONNECTING) {
+//                 ESP_LOGI(TAG, "connecting...");
+//             } else if (param->open.conn_status == ESP_HIDD_CONN_STATE_CONNECTED) {
+//                 ESP_LOGI(TAG, "connected to %02x:%02x:%02x:%02x:%02x:%02x", param->open.bd_addr[0],
+//                     param->open.bd_addr[1], param->open.bd_addr[2], param->open.bd_addr[3], param->open.bd_addr[4],
+//                     param->open.bd_addr[5]);
+//                 bt_app_task_start_up();
+//                 ESP_LOGI(TAG, "making self non-discoverable and non-connectable.");
+//                 esp_bt_gap_set_scan_mode(ESP_BT_NON_CONNECTABLE, ESP_BT_NON_DISCOVERABLE);
+//             } else {
+//                 ESP_LOGE(TAG, "unknown connection status");
+//             }
+//         } else {
+//             ESP_LOGE(TAG, "open failed!");
+//         }
+//         break;
+//     case ESP_HIDD_CLOSE_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_CLOSE_EVT");
+//         if (param->close.status == ESP_HIDD_SUCCESS) {
+//             if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTING) {
+//                 ESP_LOGI(TAG, "disconnecting...");
+//             } else if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTED) {
+//                 ESP_LOGI(TAG, "disconnected!");
+//                 bt_app_task_shut_down();
+//                 ESP_LOGI(TAG, "making self discoverable and connectable again.");
+//                 esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+//             } else {
+//                 ESP_LOGE(TAG, "unknown connection status");
+//             }
+//         } else {
+//             ESP_LOGE(TAG, "close failed!");
+//         }
+//         break;
+//     case ESP_HIDD_SEND_REPORT_EVT:
+//         if (param->send_report.status == ESP_HIDD_SUCCESS) {
+//             ESP_LOGI(TAG, "ESP_HIDD_SEND_REPORT_EVT id:0x%02x, type:%d", param->send_report.report_id,
+//                      param->send_report.report_type);
+//         } else {
+//             ESP_LOGE(TAG, "ESP_HIDD_SEND_REPORT_EVT id:0x%02x, type:%d, status:%d, reason:%d",
+//                      param->send_report.report_id, param->send_report.report_type, param->send_report.status,
+//                      param->send_report.reason);
+//         }
+//         break;
+//     case ESP_HIDD_REPORT_ERR_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_REPORT_ERR_EVT");
+//         break;
+//     case ESP_HIDD_GET_REPORT_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_GET_REPORT_EVT id:0x%02x, type:%d, size:%d", param->get_report.report_id,
+//                  param->get_report.report_type, param->get_report.buffer_size);
+//         if (check_report_id_type(param->get_report.report_id, param->get_report.report_type)) {
+//             uint8_t report_id;
+//             uint16_t report_len;
+//             if (s_local_param.protocol_mode == ESP_HIDD_REPORT_MODE) {
+//                 report_id = 0;
+//                 report_len = 4; //REPORT_PROTOCOL_MOUSE_REPORT_SIZE;
+//             } else {
+//                 // Boot Mode
+//                 report_id = ESP_HIDD_BOOT_REPORT_ID_MOUSE;
+//                 report_len = ESP_HIDD_BOOT_REPORT_SIZE_MOUSE - 1;
+//             }
+//             xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
+//             esp_bt_hid_device_send_report(param->get_report.report_type, report_id, report_len, s_local_param.buffer);
+//             xSemaphoreGive(s_local_param.mouse_mutex);
+//         } else {
+//             ESP_LOGE(TAG, "check_report_id failed!");
+//         }
+//         break;
+//     case ESP_HIDD_SET_REPORT_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_SET_REPORT_EVT");
+//         break;
+//     case ESP_HIDD_SET_PROTOCOL_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_SET_PROTOCOL_EVT");
+//         if (param->set_protocol.protocol_mode == ESP_HIDD_BOOT_MODE) {
+//             ESP_LOGI(TAG, "  - boot protocol");
+//             xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
+//             s_local_param.x_dir = -1;
+//             xSemaphoreGive(s_local_param.mouse_mutex);
+//         } else if (param->set_protocol.protocol_mode == ESP_HIDD_REPORT_MODE) {
+//             ESP_LOGI(TAG, "  - report protocol");
+//         }
+//         xSemaphoreTake(s_local_param.mouse_mutex, portMAX_DELAY);
+//         s_local_param.protocol_mode = param->set_protocol.protocol_mode;
+//         xSemaphoreGive(s_local_param.mouse_mutex);
+//         break;
+//     case ESP_HIDD_INTR_DATA_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_INTR_DATA_EVT");
+//         break;
+//     case ESP_HIDD_VC_UNPLUG_EVT:
+//         ESP_LOGI(TAG, "ESP_HIDD_VC_UNPLUG_EVT");
+//         if (param->vc_unplug.status == ESP_HIDD_SUCCESS) {
+//             if (param->close.conn_status == ESP_HIDD_CONN_STATE_DISCONNECTED) {
+//                 ESP_LOGI(TAG, "disconnected!");
+//                 bt_app_task_shut_down();
+//                 ESP_LOGI(TAG, "making self discoverable and connectable again.");
+//                 esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+//             } else {
+//                 ESP_LOGE(TAG, "unknown connection status");
+//             }
+//         } else {
+//             ESP_LOGE(TAG, "close failed!");
+//         }
+//         break;
+//     default:
+//         break;
+//     }
+// }
 
 void app_main(void)
 {
@@ -497,4 +563,15 @@ void app_main(void)
     esp_bt_gap_set_pin(ESP_BT_PIN_TYPE_FIXED, 6, pin_code);
 
     ESP_LOGI(L2CAP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
+
+    while(1){
+        uint32_t rand = esp_random();
+        uint8_t one = (uint8_t)(rand & 0xFF);
+        uint8_t two = (uint8_t)((rand >> 8) & 0xFF);
+        ESP_LOGI("MAIN", "SENDING %2X %2X", one, two);
+        uint8_t core[2] = {one, two};
+        //esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INPUT, 0x30, 2, core);
+        esp_bt_hid_device_send_report(0xa1, 0x30, 2, core);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
+    }
 }
