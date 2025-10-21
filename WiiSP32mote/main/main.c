@@ -21,15 +21,7 @@
 #include "freertos/semphr.h"
 
 #include "esp_random.h"
-#include "esp_l2cap_bt_api.h"
-#include "esp_mac.h"
-#include "esp_vfs.h"
 
-//write?
-
-
-#define L2CAP_TAG                     "L2CAP_TAG"
-#define L2CAP_DATA_LEN                100
 
 #define REPORT_PROTOCOL_MOUSE_REPORT_SIZE      (4)
 #define REPORT_BUFFER_SIZE                     REPORT_PROTOCOL_MOUSE_REPORT_SIZE
@@ -532,216 +524,6 @@ void esp_bt_hidd_cb(esp_hidd_cb_event_t event, esp_hidd_cb_param_t *param)
     }
 }
 
-// /* L2CAP STUFF*/
-// /**
-//  * @brief     handler for write and read
-//  */
-// typedef void (* l2cap_wr_task_cb_t) (void *fd);
-
-// void l2cap_wr_task_start_up(l2cap_wr_task_cb_t p_cback, int fd)
-// {
-//     xTaskCreate(p_cback, "write_read", 4096, (void *)fd, 5, NULL);
-// }
-
-// void l2cap_wr_task_shut_down()
-// {
-//     vTaskDelete(NULL);
-// }
-
-// static char *bda2str(esp_bd_addr_t bda, char *str, size_t size)
-// {
-//     if (bda == NULL || str == NULL || size < 18) {
-//         return NULL;
-//     }
-
-//     sprintf(str, "%02x:%02x:%02x:%02x:%02x:%02x",
-//             bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]);
-//     return str;
-// }
-
-// static void l2cap_write_handle(void * param)
-// {
-//     int size = 0;
-//     int fd = (int)param;
-//     uint8_t *l2cap_data = NULL;
-//     uint16_t i = 0;
-
-//     l2cap_data = malloc(L2CAP_DATA_LEN);
-//     if (!l2cap_data) {
-//         ESP_LOGE(L2CAP_TAG, "malloc l2cap_data failed, fd:%d", fd);
-//         goto done;
-//     }
-
-//     for (i = 0; i < L2CAP_DATA_LEN; ++i) {
-//         l2cap_data[i] = i;
-//     }
-
-//     do {
-//         /*
-//          * The write function is blocked until all the target length of data has been sent to the lower layer
-//          * successfully an error occurs.
-//          */
-//         size = write(fd, l2cap_data, L2CAP_DATA_LEN);
-//         if (size == -1) {
-//             break;
-//         } else if (size == 0) {
-//             /*write fail due to ringbuf is full, retry after 500 ms*/
-//             vTaskDelay(500 / portTICK_PERIOD_MS);
-//         } else {
-//             ESP_LOGI(L2CAP_TAG, "fd = %d  data_len = %d", fd, size);
-//             vTaskDelay(50 / portTICK_PERIOD_MS);
-//         }
-//     } while (1);
-// done:
-//     if (l2cap_data) {
-//         free(l2cap_data);
-//     }
-//     l2cap_wr_task_shut_down();
-// }
-
-// static void esp_hdl_bt_l2cap_cb_evt(uint16_t event, void *p_param)
-// {
-//     char bda_str[18] = {0};
-//     esp_bt_l2cap_cb_param_t *l2cap_param = (esp_bt_l2cap_cb_param_t *)p_param;
-
-//     switch (event) {
-//     case ESP_BT_L2CAP_INIT_EVT:
-//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_INIT_EVT: status:%d", l2cap_param->init.status);
-//         if (l2cap_param->init.status == ESP_BT_L2CAP_SUCCESS) {
-//             esp_bt_l2cap_vfs_register();
-//         }
-//         break;
-//     case ESP_BT_L2CAP_UNINIT_EVT:
-//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_UNINIT_EVT: status:%d", l2cap_param->uninit.status);
-//         break;
-//     case ESP_BT_L2CAP_OPEN_EVT:
-//         if (l2cap_param->open.status == ESP_BT_L2CAP_SUCCESS) {
-//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_OPEN_EVT: status:%d, fd = %d, tx mtu = %"PRId32", remote_address:%s", l2cap_param->open.status,
-//                     l2cap_param->open.fd, l2cap_param->open.tx_mtu, bda2str(l2cap_param->open.rem_bda, bda_str, sizeof(bda_str)));
-//             l2cap_wr_task_start_up(l2cap_write_handle, l2cap_param->open.fd);
-//         } else {
-//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_OPEN_EVT: status:%d", l2cap_param->open.status);
-//         }
-//         break;
-//     case ESP_BT_L2CAP_CLOSE_EVT:
-//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CLOSE_EVT: status:%d", l2cap_param->close.status);
-//         break;
-//     case ESP_BT_L2CAP_CL_INIT_EVT:
-//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CL_INIT_EVT: status:%d", l2cap_param->cl_init.status);
-//         break;
-//     case ESP_BT_L2CAP_START_EVT:
-//         if (l2cap_param->start.status == ESP_BT_L2CAP_SUCCESS) {
-//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_START_EVT: status:%d, hdl:0x%"PRIx32", sec_id:0x%x",
-//                 l2cap_param->start.status, l2cap_param->start.handle, l2cap_param->start.sec_id);
-//         } else {
-//             ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_START_EVT: status:%d", l2cap_param->start.status);
-//         }
-//         break;
-//     case ESP_BT_L2CAP_SRV_STOP_EVT:
-//         ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_CLOSE_EVT: status:%d, psm = 0x%x", l2cap_param->srv_stop.status, l2cap_param->srv_stop.psm);
-//         break;
-//     // case ESP_BT_L2CAP_VFS_REGISTER_EVT:
-//     //     ESP_LOGI(L2CAP_TAG, "ESP_BT_L2CAP_VFS_REGISTER_EVT: status:%d", l2cap_param->vfs_register.status);
-//     //     break;
-//     default:
-//         ESP_LOGI(L2CAP_TAG, "HEH?[%d]: status:?", event);
-//         break;
-//     }
-//     return;
-// }
-
-// /**
-//  * @brief  handler for the dispatched work
-//  *
-//  * @param [in] event  event id
-//  * @param [in] param  handler parameter
-//  */
-// typedef void (* bt_app_cb_t) (uint16_t event, void *param);
-
-// /**
-//  * @brief  parameter deep-copy function to be customized
-//  *
-//  * @param [out] p_dest  pointer to destination data
-//  * @param [in]  p_src   pointer to source data
-//  * @param [in]  len     data length in byte
-//  */
-// typedef void (* bt_app_copy_cb_t) (void *p_dest, void *p_src, int len);
-
-// /* message to be sent */
-// typedef struct {
-//     uint16_t       sig;      /*!< signal to bt_app_task */
-//     uint16_t       event;    /*!< message event id */
-//     bt_app_cb_t    cb;       /*!< context switch callback */
-//     void           *param;   /*!< parameter area needs to be last */
-// } bt_app_msg_t;
-
-// /* signal for `bt_app_work_dispatch` */
-// #define BT_APP_SIG_WORK_DISPATCH    (0x01)
-
-// bool bt_app_work_dispatch(bt_app_cb_t p_cback, uint16_t event, void *p_params, int param_len, bt_app_copy_cb_t p_copy_cback)
-// {
-//     ESP_LOGD(L2CAP_TAG, "%s event: 0x%x, param len: %d", __func__, event, param_len);
-
-//     bt_app_msg_t msg;
-//     memset(&msg, 0, sizeof(bt_app_msg_t));
-
-//     msg.sig = BT_APP_SIG_WORK_DISPATCH;
-//     msg.event = event;
-//     msg.cb = p_cback;
-
-//     if (param_len == 0) {
-//         return bt_app_send_msg(&msg);
-//     } else if (p_params && param_len > 0) {
-//         if ((msg.param = malloc(param_len)) != NULL) {
-//             memcpy(msg.param, p_params, param_len);
-//             /* check if caller has provided a copy callback to do the deep copy */
-//             if (p_copy_cback) {
-//                 p_copy_cback(msg.param, p_params, param_len);
-//             }
-//             return bt_app_send_msg(&msg);
-//         }
-//     }
-
-//     return false;
-// }
-
-// static void esp_bt_l2cap_cb(esp_bt_l2cap_cb_event_t event, esp_bt_l2cap_cb_param_t *param)
-// {
-//     switch (event) {
-//     case ESP_BT_L2CAP_INIT_EVT:
-//     case ESP_BT_L2CAP_UNINIT_EVT:
-//     case ESP_BT_L2CAP_OPEN_EVT:
-//     case ESP_BT_L2CAP_CLOSE_EVT:
-//     case ESP_BT_L2CAP_CL_INIT_EVT:
-//     case ESP_BT_L2CAP_START_EVT:
-//     case ESP_BT_L2CAP_SRV_STOP_EVT:
-//     //case ESP_BT_L2CAP_VFS_REGISTER_EVT: 
-//     {
-//         bt_app_work_dispatch(esp_hdl_bt_l2cap_cb_evt, event, param, sizeof(esp_bt_l2cap_cb_param_t), NULL);
-//         break;
-//     }
-//     default:
-//         ESP_LOGE(L2CAP_TAG, "Invalid L2CAP event: %d", event);
-//         break;
-//     }
-// }
-// /* L2CAP STUFF END*/
-
-int notifyHostRecv(uint8_t *data, uint16_t len) {
-    ESP_LOGI("notifyHostRecv", "start");
-    for (int i = 0; i < len; i++)
-    {
-        ESP_LOGI("notifyHostRecv", "%02x", data[i]);
-    }
-
-    //   if(ESP_OK == sendQueueData(rxQueue, data, len)){
-    //     return ESP_OK;
-    //   }else{
-    //     return ESP_FAIL;
-    //   }
-    return ESP_OK;
-}
-
 void app_main(void)
 {
     const char *TAG = "app_main";
@@ -830,28 +612,13 @@ void app_main(void)
 
     print_bt_address();
     //ESP_LOGI(TAG, "exiting: %d", SDP_ONE_ATTRIBUTE_MAX_LEN);
-
-    esp_vhci_host_callback_t vhci_callback;
-    vhci_callback.notify_host_recv = notifyHostRecv;
-    //vhci_callback.notify_host_send_available = notifyHostSendAvailable;   
-
-    if ((ret = esp_vhci_host_register_callback( &vhci_callback )) != ESP_OK) {
-        ESP_LOGE(TAG, "hci callback failed: %s\n", esp_err_to_name(ret));
-        return;
-    }
-
     while(1){
         uint32_t rand = esp_random();
         uint8_t one = (uint8_t)(rand & 0xFF);
         uint8_t two = (uint8_t)((rand >> 8) & 0xFF);
-        
-        //esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INPUT, 0x30, 2, core);
-        // esp_bt_hid_device_send_report(0xa1, 0x30, 2, core);
-        if(esp_vhci_host_check_send_available()){
-            ESP_LOGI(TAG, "SENDING %2X %2X", one, two);
-            uint8_t core[4] = {0xa1, 0x30, one, two};
-            esp_vhci_host_send_packet(core, sizeof(core));
-        }
+        ESP_LOGI(TAG, "SENDING %2X %2X", one, two);
+        uint8_t core[2] = {one, two};
+        esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INPUT, 0x30, 2, core);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 
