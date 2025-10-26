@@ -576,9 +576,9 @@ void app_main(void)
     // Initialize HID SDP information and L2CAP parameters.
     // to be used in the call of `esp_bt_hid_device_register_app` after profile initialization finishes
     do {
-        s_local_param.app_param.name = "Wiimote";
-        s_local_param.app_param.description = "WiiSPmote";
-        s_local_param.app_param.provider = "PkNess";
+        s_local_param.app_param.name = "Nintendo RVL-CNT-01";
+        s_local_param.app_param.description = "Nintendo RVL-CNT-01";
+        s_local_param.app_param.provider = "Nintendo";
         s_local_param.app_param.subclass = ESP_HID_CLASS_GPD;
         s_local_param.app_param.desc_list = WiiMoteHIDDescriptor;
         s_local_param.app_param.desc_list_len = WiiMoteHIDDescriptor_len;

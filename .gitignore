@@ -12,3 +12,9 @@ WiiSP32mote/build/
 L2Cap-tests/build/
 
 ESP32Wiimote
+
+WiimoteESP32-hci/build/
+
+WiimoteESP32/build/
+
+sdp-tests/build/

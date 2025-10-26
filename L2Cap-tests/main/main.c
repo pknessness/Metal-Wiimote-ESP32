@@ -32,6 +32,7 @@
 #include "esp_random.h"
 
 #define L2CAP_TAG                     "L2CAP_TAG"
+#define GAP_TAG                       "GAP_TAG"
 #define SDP_TAG                       "SDP_TAG"
 #define L2CAP_DATA_LEN                100
 #define BT_UNUSED_RFCOMM              -1
@@ -40,7 +41,7 @@
 
 static const char local_device_name[] = "Nintendo RVL-CNT-01";
 static esp_bt_l2cap_cntl_flags_t sec_mask = ESP_BT_L2CAP_SEC_AUTHENTICATE;
-static char *sdp_service_name = "Unknown_profile";
+static char *sdp_service_name = "Nintendo RVL-CNT-01";
 static const uint8_t  UUID_UNKNOWN[] = {0x00, 0x00, 0x10, 0x10, 0x00, 0x00, 0x10, 0x00,
                                             0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
                                         };
@@ -80,10 +81,10 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
     /* when Legacy Pairing pin code requested, this event comes */
     case ESP_BT_GAP_AUTH_CMPL_EVT:{
         if (param->auth_cmpl.stat == ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGI(L2CAP_TAG, "authentication success: %s bda:[%s]", param->auth_cmpl.device_name,
+            ESP_LOGI(GAP_TAG, "authentication success: %s bda:[%s]", param->auth_cmpl.device_name,
                      bda2str(param->auth_cmpl.bda, bda_str, sizeof(bda_str)));
         } else {
-            ESP_LOGE(L2CAP_TAG, "authentication failed, status:%d", param->auth_cmpl.stat);
+            ESP_LOGE(GAP_TAG, "authentication failed, status:%d", param->auth_cmpl.stat);
         }
         break;
     }
@@ -107,7 +108,7 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
     // }
     /* when GAP mode changed, this event comes */
     case ESP_BT_GAP_MODE_CHG_EVT:
-        ESP_LOGI(L2CAP_TAG, "ESP_BT_GAP_MODE_CHG_EVT mode:%d bda:[%s]", param->mode_chg.mode,
+        ESP_LOGI(GAP_TAG, "ESP_BT_GAP_MODE_CHG_EVT mode:%d bda:[%s]", param->mode_chg.mode,
                  bda2str(param->mode_chg.bda, bda_str, sizeof(bda_str)));
         break;
     /* other */
@@ -135,7 +136,7 @@ static void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *pa
     case ESP_BT_GAP_GET_DEV_NAME_CMPL_EVT:
     case ESP_BT_GAP_EVT_MAX:
     default: {
-        ESP_LOGI(L2CAP_TAG, "event: 0x%x", event);
+        ESP_LOGI(GAP_TAG, "event: 0x%x", event);
         break;
     }
     }
@@ -312,6 +313,7 @@ static void esp_hdl_sdp_cb_evt(uint16_t event, void *p_param)
     case ESP_SDP_INIT_EVT:
         ESP_LOGI(SDP_TAG, "ESP_SDP_INIT_EVT: status:%d", sdp_param->init.status);
         if (sdp_param->init.status == ESP_SDP_SUCCESS) {
+            //https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/bluetooth/esp_sdp.html#_CPPv425bluetooth_sdp_hdr_overlay
             record.hdr.type = ESP_SDP_TYPE_RAW;
             record.hdr.uuid.len = sizeof(UUID_UNKNOWN);
             memcpy(record.hdr.uuid.uuid.uuid128, UUID_UNKNOWN, sizeof(UUID_UNKNOWN));
@@ -568,10 +570,10 @@ void app_main(void)
         uint32_t rand = esp_random();
         uint8_t one = (uint8_t)(rand & 0xFF);
         uint8_t two = (uint8_t)((rand >> 8) & 0xFF);
-        ESP_LOGI("MAIN", "SENDING %2X %2X", one, two);
+        //ESP_LOGI("MAIN", "SENDING %2X %2X", one, two);
         uint8_t core[2] = {one, two};
         //esp_bt_hid_device_send_report(ESP_HIDD_REPORT_TYPE_INPUT, 0x30, 2, core);
-        esp_bt_hid_device_send_report(0xa1, 0x30, 2, core);
+        //esp_bt_hid_device_send_report(0xa1, 0x30, 2, core);
         vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }

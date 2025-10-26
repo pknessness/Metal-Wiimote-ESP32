@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../esp32-as-wiimote"
+		},
+		{
+			"path": "../WiiSP32mote"
+		},
+		{
+			"path": "../../../esp/v5.4.1/esp-idf/components"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"inttypes.h": "c",
+			"stdlib.h": "c",
+			"stdio.h": "c",
+			"freertos.h": "c"
+		}
+	}
+}
