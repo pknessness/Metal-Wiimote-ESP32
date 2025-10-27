@@ -17,5 +17,12 @@
     "--query-driver=C:\\Users\\ansha\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32-elf-gcc.exe",
     "--compile-commands-dir=${workspaceFolder}\\build"
   ],
-  "idf.flashType": "UART"
+  "idf.flashType": "UART",
+  "files.associations": {
+    "esp_bt_device.h": "c",
+    "array": "c",
+    "string": "c",
+    "string_view": "c",
+    "span": "c"
+  }
 }
