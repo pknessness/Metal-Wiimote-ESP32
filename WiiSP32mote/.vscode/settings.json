@@ -9,6 +9,7 @@
     "idf.toolsPathWin": "C:\\Users\\ansha\\.espressif",
     "idf.flashType": "UART",
     "files.associations": {
-        "random": "c"
+        "random": "c",
+        "esp_bt_device.h": "c"
     }
 }

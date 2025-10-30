@@ -57,7 +57,7 @@ void app_main(void)
     }
     ESP_ERROR_CHECK( ret );
 
-    ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
+    // ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
 
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
     if ((ret = esp_bt_controller_init(&bt_cfg)) != ESP_OK) {
@@ -97,8 +97,7 @@ void app_main(void)
     //     readBDADDRCommand(true);
     //     vTaskDelay(pdMS_TO_TICKS(100));
     // }
-    setControllerToHostFlowControlCommand(0x03, true);
-    writeScanEnableCommand(0x03, true);
+    // setControllerToHostFlowControlCommand(0x03, true);
     device_class_t class = {0};
     class.class[0] = 0x04;
     class.class[1] = 0x25;
@@ -109,6 +108,11 @@ void app_main(void)
     writeLocalNameCommand(name, 248, true);
     //vTaskDelay(pdMS_TO_TICKS(10));
     //setInquiryScanActivityCommand(1600, 19, true);
+    readClassOfDeviceCommand(class, true);
+
+    setEventMaskCommand(0xFFFFFFFFFFFFFFFF, true);
+
+    writeScanEnableCommand(0x03, true);
 
     //ESP_LOGI(TAG, "Own address:[%2X %2X %2X %2X %2X %2X]", address[0], address[1], address[2], address[3], address[4], address[5]); 
     ESP_LOGI(TAG, "exiting");

@@ -431,10 +431,14 @@ void handleHCI_EVT(uint8_t *data, uint16_t len) {
     uint8_t eventCode = data[0];
     uint8_t parametersLength = data[1];
     ESP_LOGI(STACK, "EVT: EC[%d] LEN[%d]", eventCode, parametersLength);
+    uint8_t status = 0;
+    if(parametersLength >= 4){
+        status = data[5];
+    }
     switch(eventCode){
         case ((uint8_t)COMMAND_COMPLETE):
             command_complete_t* packet = (command_complete_t*)(data + 2);
-            ESP_LOGI(STACK, "COMMAND_COMPLETE: LEN[%d] OPCODE[%x]", packet->num_hci_command_packets, packet->command_opcode);
+            ESP_LOGI(STACK, "COMMAND_COMPLETE: LEN[%d] OPCODE[%x] STATUS[%x]", packet->num_hci_command_packets, packet->command_opcode, status);
             if(xSemaphoreTake(commandSemaphore, (TickType_t) 10) == pdTRUE){
                 ESP_LOGI(STACK, "SEMAPHORE TAKE: %04X", packet->command_opcode);
                 commandCompleted = true;
@@ -506,6 +510,10 @@ void writeClassOfDeviceCommand(device_class_t device_class, bool blocking){
     sendHCICommand((WRITE_CLASS_OF_DEVICE | (HCI_OGF_CONTROL_BASEBAND << 10)), (uint8_t*)&device_class, 3, blocking);
 }
 
+void readClassOfDeviceCommand(device_class_t device_class, bool blocking){
+    sendHCICommand((READ_CLASS_OF_DEVICE | (HCI_OGF_CONTROL_BASEBAND << 10)), 0, 0, blocking);
+}
+
 void writeLocalNameCommand(char* local_name, uint16_t len, bool blocking){
     sendHCICommand((CHANGE_LOCAL_NAME | (HCI_OGF_CONTROL_BASEBAND << 10)), (uint8_t*)local_name, len, blocking);
 }
@@ -521,4 +529,8 @@ void setInquiryScanActivityCommand(uint16_t inquiry_scan_interval, uint16_t inqu
 
 void readBDADDRCommand(bool blocking){
     sendHCICommand((0x0009 | (HCI_OGF_INFORMATIONAL_PARAMETERS << 10)), 0, 0, blocking);
+}
+
+void setEventMaskCommand(uint64_t mask, bool blocking){
+    sendHCICommand((SET_EVENT_MASK | (HCI_OGF_CONTROL_BASEBAND << 10)), (uint8_t*)&mask, 8, blocking);
 }
