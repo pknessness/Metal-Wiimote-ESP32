@@ -28,6 +28,7 @@
 #include "esp_vfs.h"
 #include "esp_sdp_api.h"
 #include "bt_app_core.h"
+// #include "stack/sdp_api.h"
 
 #include "esp_random.h"
 
@@ -550,6 +551,12 @@ void app_main(void)
         ESP_LOGE(SDP_TAG, "%s sdp init failed: %s", __func__, esp_err_to_name(ret));
         return;
     }
+
+    uint32_t handlehid = SDP_CreateRecord();
+    uint32_t handlepnp = SDP_CreateRecord();
+    uint32_t handlessp = SDP_CreateRecord();
+
+    // SDP_AddAttribute(handlehid, 0x0001, )
 
     /*
      * Set default parameters for Legacy Pairing

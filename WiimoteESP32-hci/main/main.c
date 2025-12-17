@@ -21,6 +21,7 @@
 #include "freertos/semphr.h"
 
 #include "primordial_stack.c"
+#include "esp_mac.h"
 
 //static const char device_name[] = "Nintendo RVL-CNT-01";
 
@@ -39,6 +40,18 @@ void app_main(void)
     const char *TAG = "app_main";
     esp_err_t ret;
     char bda_str[18] = {0};
+    
+    uint8_t baseMac[6];
+
+    esp_base_mac_addr_get(baseMac);
+    baseMac[0] = 0x2C;
+    baseMac[1] = 0x10;
+    baseMac[2] = 0xC1;
+    if (esp_base_mac_addr_set(baseMac) == ESP_OK) {
+        ESP_LOGI("MAC_SET", "MAC address set successfully: %X:%X:%X:%X:%X:%X", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5]);
+    } else {
+        ESP_LOGI("MAC_SET", "Failed to set MAC");
+    }
 
     //commandSemaphore = xSemaphoreCreateBinary();
     vSemaphoreCreateBinary(commandSemaphore);
@@ -104,7 +117,7 @@ void app_main(void)
     class.class[2] = 0x00;
     writeClassOfDeviceCommand(class, true);
     char name[248] = {0};
-    memcpy(name, "PkNess's RVL-CNT-01", 19);
+    memcpy(name, "Nintendo RVL-CNT-01", 19);
     writeLocalNameCommand(name, 248, true);
     //vTaskDelay(pdMS_TO_TICKS(10));
     //setInquiryScanActivityCommand(1600, 19, true);

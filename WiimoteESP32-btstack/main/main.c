@@ -46,6 +46,9 @@
 
 #include <stddef.h>
 
+#include "esp_mac.h"
+#include "esp_log.h"
+
 // warn about unsuitable sdkconfig
 #include "sdkconfig.h"
 #if !CONFIG_BT_ENABLED
@@ -62,7 +65,25 @@
 
 extern int btstack_main(int argc, const char * argv[]);
 
+#define ENABLE_LOG_BTSTACK_EVENTS
+
 int app_main(void){
+
+
+    uint8_t baseMac[6];
+
+    esp_base_mac_addr_get(baseMac);
+    // baseMac[0] = 0x2C;
+    // baseMac[1] = 0x10;
+    // baseMac[2] = 0xC1;
+    baseMac[0] = 0x00;
+    baseMac[1] = 0x1F;
+    baseMac[2] = 0xC5;
+    if (esp_base_mac_addr_set(baseMac) == ESP_OK) {
+        ESP_LOGI("MAC_SET", "MAC address set successfully: %X:%X:%X:%X:%X:%X", baseMac[0], baseMac[1], baseMac[2], baseMac[3], baseMac[4], baseMac[5]);
+    } else {
+        ESP_LOGI("MAC_SET", "Failed to set MAC");
+    }
 
     // optional: enable packet logger
     // hci_dump_init(hci_dump_embedded_stdout_get_instance());

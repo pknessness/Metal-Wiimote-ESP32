@@ -59,7 +59,8 @@
 #include "btstack.h"
 
 #include "esp_log.h"
-
+#include "esp_system.h"
+#include "esp_mac.h"
 
 
 #ifdef HAVE_BTSTACK_STDIN
@@ -77,7 +78,7 @@ static btstack_packet_callback_registration_t l2cap_event_callback_registration;
 
 static uint16_t hid_cid;
 
-#define PRINTBUFFER_SIZE 500
+#define PRINTBUFFER_SIZE 1000
 char READ_PRINTBUFFER [PRINTBUFFER_SIZE+1];
 
 void ESP_LOGI_BUFFER(char* tag, uint8_t *data, uint16_t len){
@@ -100,7 +101,7 @@ static uint8_t mote_service_buffer_1[] = {0x36, 0x00, 0x4d, 0x09, 0x00, 0x00, 0x
 static uint8_t mote_service_buffer_2[] = {0x36, 0x01, 0xcc, 0x09, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x00, 0x00, 0x09, 0x00, 0x01, 0x35, 0x03, 0x19, 0x11, 0x24, 0x09, 0x00, 0x04, 0x35, 0x0d, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x11, 0x35, 0x03, 0x19, 0x00, 0x11, 0x09, 0x00, 0x05, 0x35, 0x03, 0x19, 0x10, 0x02, 0x09, 0x00, 0x06, 0x35, 0x09, 0x09, 0x65, 0x6e, 0x09, 0x00, 0x6a, 0x09, 0x01, 0x00, 0x09, 0x00, 0x09, 0x35, 0x08, 0x35, 0x06, 0x19, 0x11, 0x24, 0x09, 0x01, 0x00, 0x09, 0x00, 0x0d, 0x35, 0x0f, 0x35, 0x0d, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x13, 0x35, 0x03, 0x19, 0x00, 0x11, 0x09, 0x01, 0x00, 0x25, 0x13, 0x4e, 0x69, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x6f, 0x20, 0x52, 0x56, 0x4c, 0x2d, 0x43, 0x4e, 0x54, 0x2d, 0x30, 0x31, 0x09, 0x01, 0x01, 0x25, 0x13, 0x4e, 0x69, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x6f, 0x20, 0x52, 0x56, 0x4c, 0x2d, 0x43, 0x4e, 0x54, 0x2d, 0x30, 0x31, 0x09, 0x01, 0x02, 0x25, 0x08, 0x4e, 0x69, 0x6e, 0x74, 0x65, 0x6e, 0x64, 0x6f, 0x09, 0x02, 0x00, 0x09, 0x01, 0x00, 0x09, 0x02, 0x01, 0x09, 0x01, 0x11, 0x09, 0x02, 0x02, 0x08, 0x04, 0x09, 0x02, 0x03, 0x08, 0x33, 0x09, 0x02, 0x04, 0x28, 0x00, 0x09, 0x02, 0x05, 0x28, 0x01, 0x09, 0x02, 0x06, 0x35, 0xdf, 0x35, 0xdd, 0x08, 0x22, 0x25, 0xd9, 0x05, 0x01, 0x09, 0x05, 0xa1, 0x01, 0x85, 0x10, 0x15, 0x00, 0x26, 0xff, 0x00, 0x75, 0x08, 0x95, 0x01, 0x06, 0x00, 0xff, 0x09, 0x01, 0x91, 0x00, 0x85, 0x11, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x12, 0x95, 0x02, 0x09, 0x01, 0x91, 0x00, 0x85, 0x13, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x14, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x15, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x16, 0x95, 0x15, 0x09, 0x01, 0x91, 0x00, 0x85, 0x17, 0x95, 0x06, 0x09, 0x01, 0x91, 0x00, 0x85, 0x18, 0x95, 0x15, 0x09, 0x01, 0x91, 0x00, 0x85, 0x19, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x1a, 0x95, 0x01, 0x09, 0x01, 0x91, 0x00, 0x85, 0x20, 0x95, 0x06, 0x09, 0x01, 0x81, 0x00, 0x85, 0x21, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x22, 0x95, 0x04, 0x09, 0x01, 0x81, 0x00, 0x85, 0x30, 0x95, 0x02, 0x09, 0x01, 0x81, 0x00, 0x85, 0x31, 0x95, 0x05, 0x09, 0x01, 0x81, 0x00, 0x85, 0x32, 0x95, 0x0a, 0x09, 0x01, 0x81, 0x00, 0x85, 0x33, 0x95, 0x11, 0x09, 0x01, 0x81, 0x00, 0x85, 0x34, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x35, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x36, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x37, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x3d, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x3e, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0x85, 0x3f, 0x95, 0x15, 0x09, 0x01, 0x81, 0x00, 0xc0, 0x09, 0x02, 0x07, 0x35, 0x08, 0x35, 0x06, 0x09, 0x04, 0x09, 0x09, 0x01, 0x00, 0x09, 0x02, 0x08, 0x28, 0x00, 0x09, 0x02, 0x09, 0x28, 0x01, 0x09, 0x02, 0x0a, 0x28, 0x01, 0x09, 0x02, 0x0b, 0x09, 0x01, 0x00, 0x09, 0x02, 0x0c, 0x09, 0x0c, 0x80, 0x09, 0x02, 0x0d, 0x28, 0x00, 0x09, 0x02, 0x0e, 0x28, 0x00};
 static uint8_t mote_service_buffer_3[] = {0x36, 0x00, 0x5a, 0x09, 0x00, 0x00, 0x0a, 0x00, 0x01, 0x00, 0x01, 0x09, 0x00, 0x01, 0x35, 0x03, 0x19, 0x12, 0x00, 0x09, 0x00, 0x04, 0x35, 0x0d, 0x35, 0x06, 0x19, 0x01, 0x00, 0x09, 0x00, 0x01, 0x35, 0x03, 0x19, 0x00, 0x01, 0x09, 0x00, 0x05, 0x35, 0x03, 0x19, 0x10, 0x02, 0x09, 0x00, 0x09, 0x35, 0x08, 0x35, 0x06, 0x19, 0x12, 0x00, 0x09, 0x01, 0x00, 0x09, 0x02, 0x00, 0x09, 0x01, 0x00, 0x09, 0x02, 0x01, 0x09, 0x05, 0x7e, 0x09, 0x02, 0x02, 0x09, 0x03, 0x06, 0x09, 0x02, 0x03, 0x09, 0x06, 0x00, 0x09, 0x02, 0x04, 0x28, 0x01, 0x09, 0x02, 0x05, 0x09, 0x00, 0x02};
 
-#define RAW_WIIMOTE_BUFFERS
+// #define RAW_WIIMOTE_BUFFERS
 
 // from USB HID Specification 1.1, Appendix B.2
 const uint8_t hid_descriptor_mouse_boot_mode[] = {
@@ -252,29 +253,29 @@ uint8_t WiiMoteHIDDescriptor[] = {
     0xC0,              // End Collection
 };
 
-// HID Report sending
-static void send_report(uint8_t buttons, int8_t dx, int8_t dy){
-    // setup HID message: A1 = Input Report, Report ID, Payload
-    uint8_t message[] = {0xa1, buttons, (uint8_t) dx, (uint8_t) dy};
-    hid_device_send_interrupt_message(hid_cid, &message[0], sizeof(message));
-    printf("Mouse: %d/%d - buttons: %02x\n", dx, dy, buttons);
-}
+// // HID Report sending
+// static void send_report(uint8_t buttons, int8_t dx, int8_t dy){
+//     // setup HID message: A1 = Input Report, Report ID, Payload
+//     uint8_t message[] = {0xa1, buttons, (uint8_t) dx, (uint8_t) dy};
+//     hid_device_send_interrupt_message(hid_cid, &message[0], sizeof(message));
+//     printf("Mouse: %d/%d - buttons: %02x\n", dx, dy, buttons);
+// }
 
-static int dx;
-static int dy;
-static uint8_t buttons;
-static int hid_boot_device = 0;
+// static int dx;
+// static int dy;
+// static uint8_t buttons;
+// static int hid_boot_device = 0;
 
-static void mousing_can_send_now(void){
-    send_report(buttons, dx, dy);
-    // reset
-    dx = 0;
-    dy = 0;
-    if (buttons){
-        buttons = 0;
-        hid_device_request_can_send_now_event(hid_cid);
-    }
-}
+// static void mousing_can_send_now(void){
+//     send_report(buttons, dx, dy);
+//     // reset
+//     dx = 0;
+//     dy = 0;
+//     if (buttons){
+//         buttons = 0;
+//         hid_device_request_can_send_now_event(hid_cid);
+//     }
+// }
 
 // Demo Application
 
@@ -284,37 +285,37 @@ static const int MOUSE_SPEED = 30;
 
 // On systems with STDIN, we can directly type on the console
 
-static void stdin_process(char character){
+// static void stdin_process(char character){
 
-    if (!hid_cid) {
-        printf("Mouse not connected, ignoring '%c'\n", character);
-        return;
-    }
+//     if (!hid_cid) {
+//         printf("Mouse not connected, ignoring '%c'\n", character);
+//         return;
+//     }
 
-    switch (character){
-        case 'a':
-            dx -= MOUSE_SPEED;
-            break;
-        case 's':
-            dy += MOUSE_SPEED;
-            break;
-        case 'd':
-            dx += MOUSE_SPEED;
-            break;
-        case 'w':
-            dy -= MOUSE_SPEED;
-            break;
-        case 'l':
-            buttons |= 1;
-            break;
-        case 'r':
-            buttons |= 2;
-            break;
-        default:
-            return;
-    }
-    hid_device_request_can_send_now_event(hid_cid);
-}
+//     switch (character){
+//         case 'a':
+//             dx -= MOUSE_SPEED;
+//             break;
+//         case 's':
+//             dy += MOUSE_SPEED;
+//             break;
+//         case 'd':
+//             dx += MOUSE_SPEED;
+//             break;
+//         case 'w':
+//             dy -= MOUSE_SPEED;
+//             break;
+//         case 'l':
+//             buttons |= 1;
+//             break;
+//         case 'r':
+//             buttons |= 2;
+//             break;
+//         default:
+//             return;
+//     }
+//     hid_device_request_can_send_now_event(hid_cid);
+// }
 
 #else
 
@@ -377,57 +378,134 @@ static void hid_embedded_start_mousing(void){
 }
 #endif
 
+static uint8_t pin_code[6];
+
 static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * packet, uint16_t packet_size){
     UNUSED(channel);
     UNUSED(packet_size);
     switch (packet_type){
         case HCI_EVENT_PACKET:
             switch (hci_event_packet_get_type(packet)){
+                // case HCI_EVENT_USER_CONFIRMATION_REQUEST:
+                //     // ssp: inform about user confirmation request
+                //     log_info("SSP User Confirmation Request with numeric value '%06"PRIu32"'\n", hci_event_user_confirmation_request_get_numeric_value(packet));
+                //     log_info("SSP User Confirmation Auto accept\n");
+                //     break;
+                case HCI_EVENT_PIN_CODE_REQUEST:
+                    // inform about pin code request
+                    //printf("Pin code request - using '0000'\n\r");
+                    // reverse_bd_addr(&packet[2], event_addr);
+                    uint8_t wiiAddr[6];
+                    hci_event_pin_code_request_get_bd_addr(packet, wiiAddr);
+                    uint8_t baseMac[6];
+                    esp_base_mac_addr_get(baseMac);
+                    pin_code[0] = baseMac[5]+2;
+                    pin_code[1] = baseMac[4];
+                    pin_code[2] = baseMac[3];
+                    pin_code[3] = baseMac[2];
+                    pin_code[4] = baseMac[1];
+                    pin_code[5] = baseMac[0];
+                    hci_send_cmd(&hci_pin_code_request_reply, &wiiAddr, 6, pin_code);
+                    // gap_pin_code_wiiAddrresponse(wiiAddr, "0000");
+                    ESP_LOGI("HCI", "HCI_EVENT_PIN_CODE_REQUEST"); 
+                    ESP_LOGI_BUFFER("RESPONDING TO", wiiAddr, 6); 
+                    ESP_LOGI_BUFFER("HCI PIN", pin_code, 6); 
+                    break; 
+                case HCI_EVENT_TRANSPORT_PACKET_SENT:
+                case HCI_EVENT_NUMBER_OF_COMPLETED_PACKETS:
+                case HCI_EVENT_COMMAND_COMPLETE: //unnecessary to respond
+                
+                case HCI_EVENT_CONNECTION_REQUEST: //handled internally
+                case HCI_EVENT_IO_CAPABILITY_RESPONSE: //handled internally
                 case HCI_EVENT_USER_CONFIRMATION_REQUEST:
-                    // ssp: inform about user confirmation request
-                    log_info("SSP User Confirmation Request with numeric value '%06"PRIu32"'\n", hci_event_user_confirmation_request_get_numeric_value(packet));
-                    log_info("SSP User Confirmation Auto accept\n");
-                    break;
+                case HCI_EVENT_IO_CAPABILITY_REQUEST:
 
+                case HCI_SUBEVENT_LE_PERIODIC_ADVERTISING_REPORT: // we don't care about LE
+                case HCI_SUBEVENT_LE_CONNECTION_UPDATE_COMPLETE: // we don't care about LE
+                case HCI_SUBEVENT_LE_CREATE_BIG_COMPLETE: // we don't care about LE
+
+                case BTSTACK_EVENT_NR_CONNECTIONS_CHANGED: //dunno what this does
+                    break;
+                case GAP_EVENT_PAIRING_STARTED:
+                    ESP_LOGI("HCI", "GAP_EVENT_PAIRING_STARTED");
+                    break;
+                case BTSTACK_EVENT_SCAN_MODE_CHANGED:
+                    ESP_LOGI("HCI", "BTSTACK_EVENT_SCAN_MODE_CHANGED");
+                    break;
+                case BTSTACK_EVENT_STATE:
+                    ESP_LOGI("HCI", "BTSTACK_EVENT_STATE[%x]", btstack_event_state_get_state(packet));
+                    // typedef enum {
+                    //     HCI_STATE_OFF = 0,
+                    //     HCI_STATE_INITIALIZING,
+                    //     HCI_STATE_WORKING,
+                    //     HCI_STATE_HALTING,
+                    //     HCI_STATE_SLEEPING,
+                    //     HCI_STATE_FALLING_ASLEEP
+                    // } HCI_STATE;
+                    break;
+                default:
+                    ESP_LOGI("HCI", "UNHANDLED EVENT: [0x%0X]", hci_event_packet_get_type(packet)); 
+                    ESP_LOGI_BUFFER("HCI: UNHANDLED PACKET:", packet, packet_size); 
+                    break;
+            }
+            break;
+        default:
+            ESP_LOGI("WACK UNHANDLED PACKET 1", "PACKET_TYPE: [0x%0X]", packet_type); 
+            ESP_LOGI_BUFFER("WACK UNHANDLED PACKET 1", packet, packet_size); 
+            break;
+    }
+}
+
+static void l2cap_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * packet, uint16_t packet_size){
+    switch (packet_type){
+        case HCI_EVENT_PACKET:
+            switch (hci_event_packet_get_type(packet)){
+                default:
+                    ESP_LOGI("L2CAP", "UNHANDLED EVENT: [0x%0X] CH:%x", packet_type, channel); 
+                    ESP_LOGI_BUFFER("L2CAP: UNHANDLED PACKET:", packet, packet_size); 
+                        break;
+            }
+        default:
+            ESP_LOGI("WACK UNHANDLED PACKET 2", "PACKET_TYPE: [0x%0X] CH:%x", packet_type, channel); 
+            ESP_LOGI_BUFFER("WACK UNHANDLED PACKET 2", packet, packet_size); 
+            break;
+    }
+}
+
+static void hidd_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * packet, uint16_t packet_size){
+    switch (packet_type){
+        case HCI_EVENT_PACKET:
+            switch (hci_event_packet_get_type(packet)){
                 case HCI_EVENT_HID_META:
                     switch (hci_event_hid_meta_get_subevent_code(packet)){
                         case HID_SUBEVENT_CONNECTION_OPENED:
                             if (hid_subevent_connection_opened_get_status(packet) != ERROR_CODE_SUCCESS) return;
                             hid_cid = hid_subevent_connection_opened_get_hid_cid(packet);
-#ifdef HAVE_BTSTACK_STDIN
-                            printf("HID Connected, control mouse using 'a','s',''d', 'w' keys for movement and 'l' and 'r' for buttons...\n");
-#else
-                            printf("HID Connected, simulating mouse movements...\n");
-                            hid_embedded_start_mousing();
-#endif
+                            printf("HID Connected, CID: %x\n", hid_cid);
                             break;
                         case HID_SUBEVENT_CONNECTION_CLOSED:
                             printf("HID Disconnected\n");
                             hid_cid = 0;
                             break;
                         case HID_SUBEVENT_CAN_SEND_NOW:
-                            mousing_can_send_now();
+                            printf("HID Can send now\n");
                             break;
                         default:
+                            ESP_LOGI("HID", "EVENT: [0x%0X] CH:%x", hci_event_hid_meta_get_subevent_code(packet), channel); 
+                            ESP_LOGI_BUFFER("HID: PACKET: ", packet, packet_size); 
                             break;
                     }
                     break;
                 default:
-                    ESP_LOGI("PACKET_HANDLER", "EVENT: [0x%0X]", hci_event_packet_get_type(packet)); 
-                    ESP_LOGI_BUFFER("PACKET_HANDLER: EVENT: ", packet, packet_size); 
+                    ESP_LOGI("HID", "UNHANDLED EVENT: [0x%0X] CH:%x", hci_event_packet_get_type(packet), channel); 
+                    ESP_LOGI_BUFFER("HID: UNHANDLED PACKET: ", packet, packet_size); 
                     break;
             }
-            break;
         default:
-            ESP_LOGI("PACKET_HANDLER", "PT:%x CH:%x", packet_type, channel); 
-            ESP_LOGI_BUFFER("PACKET_HANDLER", packet, packet_size); 
+            ESP_LOGI("WACK UNHANDLED PACKET 3", "PACKET_TYPE: [0x%0X] CH:%x", packet_type, channel); 
+            ESP_LOGI_BUFFER("WACK UNHANDLED PACKET 3", packet, packet_size); 
             break;
     }
-}
-
-static void l2cap_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t * packet, uint16_t packet_size){
-    ESP_LOGI("L2CAP_HANDLER", "PT:%x CH:%x", packet_type, channel); 
-    ESP_LOGI_BUFFER("L2CAP_HANDLER", packet, packet_size); 
 }
 
 // void l2cap_packet_handler (void * connection, uint8_t packet_type,
@@ -449,11 +527,10 @@ int btstack_main(int argc, const char * argv[]);
 int btstack_main(int argc, const char * argv[]){
     (void)argc;
     (void)argv;
-
     // allow to get found by inquiry
     gap_discoverable_control(1);
     // use Limited Discoverable Mode; Peripheral; Pointing Device as CoD
-    gap_set_class_of_device(0x2540);
+    gap_set_class_of_device(0x2504);
     // set local name to be identified - zeroes will be replaced by actual BD ADDR
     gap_set_local_name("Nintendo RVL-CNT-01");
     // allow for role switch in general and sniff mode
@@ -472,61 +549,35 @@ int btstack_main(int argc, const char * argv[]){
     // SDP Server
     sdp_init();
 
-#ifdef RAW_WIIMOTE_BUFFERS
 
+
+    // btstack_assert(de_get_len( mote_service_buffer_2) <= sizeof(mote_service_buffer_2));
+    // sdp_register_service(mote_service_buffer_2);
+
+    // btstack_assert(de_get_len( mote_service_buffer_3) <= sizeof(mote_service_buffer_3));
+    // sdp_register_service(mote_service_buffer_3);
+
+    btstack_assert(de_get_len( mote_service_buffer_1) <= sizeof(mote_service_buffer_1));
     sdp_register_service(mote_service_buffer_1);
-    sdp_register_service(mote_service_buffer_2);
-    sdp_register_service(mote_service_buffer_3);
-
-#else
-
-    uint8_t hid_virtual_cable = 0;
-    uint8_t hid_remote_wake = 1;
-    uint8_t hid_reconnect_initiate = 1;
-    uint8_t hid_normally_connectable = 1;
-
-    hid_sdp_record_t hid_params = {
-        // hid sevice subclass 2580 Mouse, hid counntry code 33 US
-        0x2540, 33, 
-        hid_virtual_cable, hid_remote_wake, 
-        hid_reconnect_initiate, hid_normally_connectable,
-        hid_boot_device, 
-        0xFFFF, 0xFFFF, 3200,
-        hid_descriptor_mouse_boot_mode,
-        sizeof(hid_descriptor_mouse_boot_mode), 
-        hid_device_name
-    };
-
-    memset(hid_service_buffer, 0, sizeof(hid_service_buffer));
-    hid_create_sdp_record(hid_service_buffer, sdp_create_service_record_handle(), &hid_params);
-    btstack_assert(de_get_len( hid_service_buffer) <= sizeof(hid_service_buffer));
-    sdp_register_service(hid_service_buffer);
-
-    // See https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers if you don't have a USB Vendor ID and need a Bluetooth Vendor ID
-    // device info: BlueKitchen GmbH, product 2, version 1
-    device_id_create_sdp_record(device_id_sdp_service_buffer, sdp_create_service_record_handle(), DEVICE_ID_VENDOR_ID_SOURCE_BLUETOOTH, BLUETOOTH_COMPANY_ID_BLUEKITCHEN_GMBH, 2, 1);
-    btstack_assert(de_get_len( device_id_sdp_service_buffer) <= sizeof(device_id_sdp_service_buffer));
-    sdp_register_service(device_id_sdp_service_buffer);
-
-#endif
 
     // HID Device
     hid_device_init(false, sizeof(WiiMoteHIDDescriptor), WiiMoteHIDDescriptor);
     // register for HCI events
     hci_event_callback_registration.callback = &packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
+
     l2cap_event_callback_registration.callback = &l2cap_packet_handler;
     l2cap_add_event_handler(&l2cap_event_callback_registration);
 
     // register for HID
-    hid_device_register_packet_handler(&packet_handler);
+    hid_device_register_packet_handler(&hidd_packet_handler);
 
     // ESP_LOGI("l2cap_reg_0x11", "%0X", l2cap_register_service(&l2cap_packet_handler, 0x11, 100, gap_get_security_level()));
     // ESP_LOGI("l2cap_reg_0x13", "%0X", l2cap_register_service(&l2cap_packet_handler, 0x13, 100, gap_get_security_level()));
 
 
 #ifdef HAVE_BTSTACK_STDIN
-    btstack_stdin_setup(stdin_process);
+    // btstack_stdin_setup(stdin_process);
 #endif
     // turn on!
     hci_power_control(HCI_POWER_ON);
